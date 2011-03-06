@@ -31,11 +31,10 @@ public class AnimalQuizTest {
         OutStream writer = mock(OutStream.class);
         InStream inputData = mock(InStream.class);
         AnimalQuiz animalQuiz = new AnimalQuiz(inputData, writer, "elefant");
-        //animalQuiz.setCommand(new String[]{});
         animalQuiz.start();
         verify(writer).output("think of an animal");
         animalQuiz.step();
-        verify(writer).output("was it a elefant?");
+        verify(writer).output("Is it a elefant?");
     }
 
 
@@ -55,16 +54,16 @@ public class AnimalQuizTest {
         verify(writer).output("think of an animal");
         animalQuiz.step();
 
-        verify(writer).output("was it a elefant?");
+        verify(writer).output("Is it a elefant?");
         animalQuiz.step();
 
-        verify(writer).output("what animal was it?");
+        verify(writer).output("What animal was?");
         animalQuiz.step();
 
-        verify(writer).output("what question will you suggest to distinguish a elefant from a mouse?");
+        verify(writer).output("What question would you suggest to distinguish a elefant from a mouse?");
         animalQuiz.step();
 
-        verify(writer).output("what is the answer?");
+        verify(writer).output("What should be the answer to the question \"Is it a big animal\" to indicate a mouse compared to a elefant?");
     }
 
 
@@ -214,11 +213,9 @@ public class AnimalQuizTest {
         subRoot.setNoBranch(mouse);
         subRoot.setYesBranch(bird);
 
-
         root.setQuestion("Is it a big animal?");
         root.setYesBranch(elefant);
         root.setNoBranch(subRoot);
-
 
         AnimalQuiz animalQuiz = new AnimalQuiz(inputData, writer, root);
         when(inputData.getInput()).thenReturn("No");
@@ -232,6 +229,10 @@ public class AnimalQuizTest {
 
         verify(writer).output("Does it fly?");
     }
+
+
+
+
 
 
     @Test
@@ -276,13 +277,10 @@ public class AnimalQuizTest {
         animalQuiz.start();
         verify(writer).output("think of an animal");
         animalQuiz.step();
-
         verify(writer).output("Is it a big animal?");
         animalQuiz.step();
-
         verify(writer).output("Does it fly?");
         animalQuiz.step();
-
         verify(writer).output("Is it an insect?");
         animalQuiz.step();
     }
@@ -297,7 +295,7 @@ public class AnimalQuizTest {
         root.setLeaf(true);
 
         AnimalQuiz animalQuiz = new AnimalQuiz(inputData, writer, root);
-        when(inputData.getInput()).thenReturn("No").thenReturn("mouse").thenReturn("Is it a big animal?").thenReturn("no").thenReturn("no").thenReturn("worm").thenReturn("is it an insect?").thenReturn("yes");
+        when(inputData.getInput()).thenReturn("No").thenReturn("mouse").thenReturn("Is it a big animal?").thenReturn("no").thenReturn("no").thenReturn("worm").thenReturn("is it an insect?");//.thenReturn("yes");
 
         animalQuiz.start();
         verify(writer).output("think of an animal");
@@ -306,7 +304,7 @@ public class AnimalQuizTest {
         verify(writer).output("Is it a elefant?");
         animalQuiz.step();
 
-        verify(writer).output("What animal was?");
+        verify(writer).output("What animal was?"); // mouse
         animalQuiz.step();
 
         verify(writer).output("What question would you suggest to distinguish a elefant from a mouse?");

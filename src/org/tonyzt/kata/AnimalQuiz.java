@@ -11,6 +11,8 @@ import java.util.Scanner;
  */
 public class AnimalQuiz {
     Node knowelegeTree;
+    Node currentNode;
+
     OutStream _writer;
     InStream _inputData;
     String _animal;
@@ -56,7 +58,6 @@ public class AnimalQuiz {
     }
 
     public static void main(String[] string) {
-
         AnimalQuiz animalQuiz = new AnimalQuiz();
         animalQuiz.start();
         while(true) {
@@ -66,7 +67,8 @@ public class AnimalQuiz {
 
     public void step() {
         if ("STARTED".equals(state)) {
-            System.out.println("started");
+            currentNode=knowelegeTree;
+            //System.out.println("started");
             if (knowelegeTree.isLeaf()) {
                 _writer.output("Is it a "+knowelegeTree.getAnimal()+"?");
                 state="GUESS_MADE";
@@ -78,18 +80,20 @@ public class AnimalQuiz {
         }
         if ("GUESSING".equals(state)) {
             String answer =_inputData.getInput();
-            Node node = ("no".equalsIgnoreCase(answer)?knowelegeTree.getNoBranch():knowelegeTree.getYesBranch());
+            //Node node = ("no".equalsIgnoreCase(answer)?knowelegeTree.getNoBranch():knowelegeTree.getYesBranch());
+            Node node = ("no".equalsIgnoreCase(answer)?currentNode.getNoBranch():currentNode.getYesBranch());
             if (node.isLeaf())  {
                 _writer.output("Is it a "+node.getAnimal()+"?");
                 state = "GUESS_MADE";
             } else {
                 _writer.output(node.getQuestion());
-                knowelegeTree= node;
+                //currentNode = knowelegeTree;
+                currentNode= node;
             }
         }
         if ("GUESS_MADE".equals(state)) {
             String confirmation = this._inputData.getInput();
-            if ("No".equalsIgnoreCase(confirmation)) {
+            if ("no".equalsIgnoreCase(confirmation)) {
                 _writer.output("What animal was?");
                 thoughtAnimal = _inputData.getInput();
                 state = "THOUGHT_ANIMAL_STORED";
@@ -99,7 +103,8 @@ public class AnimalQuiz {
             }
         }
         if ("THOUGHT_ANIMAL_STORED".equals(state)) {
-            _writer.output("What question would you suggest to distinguish a "+knowelegeTree.getAnimal()+" from a "+thoughtAnimal+"?");
+            //_writer.output("What question would you suggest to distinguish a "+knowelegeTree.getAnimal()+" from a "+thoughtAnimal+"?");
+            _writer.output("What question would you suggest to distinguish a "+currentNode.getAnimal()+" from a "+thoughtAnimal+"?");
             state = "GETTING_QUESTION";
         }
         if ("GETTING_QUESTION".equals(state)) {
@@ -107,7 +112,8 @@ public class AnimalQuiz {
             state = "GETTING_ANSWER";
         }
         if ("GETTING_ANSWER".equals(state)) {
-            _writer.output("What should be the answer to the question \""+question+"\" "+"to indicate a "+thoughtAnimal+" compared to a "+knowelegeTree.getAnimal()+"?");
+            //_writer.output("What should be the answer to the question \""+question+"\" "+"to indicate a "+thoughtAnimal+" compared to a "+knowelegeTree.getAnimal()+"?");
+            _writer.output("What should be the answer to the question \""+question+"\" "+"to indicate a "+thoughtAnimal+" compared to a "+currentNode.getAnimal()+"?");
             answer = _inputData.getInput();
             state = "ADDING_KNOWELEGE";
             add_knowlege(question,answer,thoughtAnimal);
@@ -117,18 +123,17 @@ public class AnimalQuiz {
 
     private void add_knowlege(String question, String answer, String animal)
     {
-        System.out.println("adding knowelege");
         Node node = new Node(animal);
-        Node oldNode = new Node(knowelegeTree.getAnimal());
-        knowelegeTree.setLeaf(false);
-        knowelegeTree.setAnimal("");
-        knowelegeTree.setQuestion(question);
+        Node oldNode = new Node(currentNode.getAnimal());
+        currentNode.setLeaf(false);
+        currentNode.setAnimal("");
+        currentNode.setQuestion(question);
         if ("yes".equalsIgnoreCase(answer.toLowerCase())) {
-            knowelegeTree.setYesBranch(node);
-            knowelegeTree.setNoBranch(oldNode);
+            currentNode.setYesBranch(node);
+            currentNode.setNoBranch(oldNode);
         } else {
-            knowelegeTree.setYesBranch(oldNode);
-            knowelegeTree.setNoBranch(node);
+            currentNode.setYesBranch(oldNode);
+            currentNode.setNoBranch(node);
         }
     }
 
