@@ -1,5 +1,8 @@
 package org.tonyzt.kata;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+
 
 
 /**
@@ -10,6 +13,8 @@ import java.util.Scanner;
  * To change this template use File | Settings | File Templates.
  */
 public class AnimalQuiz {
+    private List<String> answersList = new ArrayList<String>();
+
     Node knowelegeTree;
     Node currentNode;
 
@@ -34,6 +39,10 @@ public class AnimalQuiz {
         _animal=node.getAnimal();
         knowelegeTree = node;
         _writer = writer;
+    }
+
+    public Node getNode() {
+        return knowelegeTree;
     }
 
     @Deprecated
@@ -67,8 +76,8 @@ public class AnimalQuiz {
 
     public void step() {
         if ("STARTED".equals(state)) {
+            this.answersList=new ArrayList<String>();
             currentNode=knowelegeTree;
-            //System.out.println("started");
             if (knowelegeTree.isLeaf()) {
                 _writer.output("Is it a "+knowelegeTree.getAnimal()+"?");
                 state="GUESS_MADE";
@@ -80,16 +89,17 @@ public class AnimalQuiz {
         }
         if ("GUESSING".equals(state)) {
             String answer =_inputData.getInput();
-            //Node node = ("no".equalsIgnoreCase(answer)?knowelegeTree.getNoBranch():knowelegeTree.getYesBranch());
+            this.answersList.add(answer);
             Node node = ("no".equalsIgnoreCase(answer)?currentNode.getNoBranch():currentNode.getYesBranch());
             if (node.isLeaf())  {
                 _writer.output("Is it a "+node.getAnimal()+"?");
                 state = "GUESS_MADE";
+                currentNode= node;
             } else {
                 _writer.output(node.getQuestion());
-                //currentNode = knowelegeTree;
                 currentNode= node;
             }
+            return;
         }
         if ("GUESS_MADE".equals(state)) {
             String confirmation = this._inputData.getInput();
@@ -98,48 +108,70 @@ public class AnimalQuiz {
                 thoughtAnimal = _inputData.getInput();
                 state = "THOUGHT_ANIMAL_STORED";
             } else {
-                System.out.println("yeah");
+                _writer.output("yeah");
                 state="STARTED";
             }
+            return;
         }
         if ("THOUGHT_ANIMAL_STORED".equals(state)) {
-            //_writer.output("What question would you suggest to distinguish a "+knowelegeTree.getAnimal()+" from a "+thoughtAnimal+"?");
             _writer.output("What question would you suggest to distinguish a "+currentNode.getAnimal()+" from a "+thoughtAnimal+"?");
-            state = "GETTING_QUESTION";
+            question = _inputData.getInput();
+            state = "GETTING_ANSWER";
+            return;
         }
         if ("GETTING_QUESTION".equals(state)) {
             question = _inputData.getInput();
             state = "GETTING_ANSWER";
+            return;
         }
         if ("GETTING_ANSWER".equals(state)) {
-            //_writer.output("What should be the answer to the question \""+question+"\" "+"to indicate a "+thoughtAnimal+" compared to a "+knowelegeTree.getAnimal()+"?");
             _writer.output("What should be the answer to the question \""+question+"\" "+"to indicate a "+thoughtAnimal+" compared to a "+currentNode.getAnimal()+"?");
             answer = _inputData.getInput();
             state = "ADDING_KNOWELEGE";
             add_knowlege(question,answer,thoughtAnimal);
             state = "STARTED";
+            return;
         }
     }
 
     private void add_knowlege(String question, String answer, String animal)
     {
-        Node node = new Node(animal);
-        Node oldNode = new Node(currentNode.getAnimal());
-        currentNode.setLeaf(false);
-        currentNode.setAnimal("");
-        currentNode.setQuestion(question);
-        if ("yes".equalsIgnoreCase(answer.toLowerCase())) {
-            currentNode.setYesBranch(node);
-            currentNode.setNoBranch(oldNode);
-        } else {
-            currentNode.setYesBranch(oldNode);
-            currentNode.setNoBranch(node);
-        }
+        Node node = knowelegeTree.arrangeByPath(this.answersList,animal,question,answer);
+        knowelegeTree=node;
+
+
+//        Node node = new Node(animal);
+//        Node oldNode = new Node(currentNode.getAnimal());
+//        currentNode.setLeaf(false);
+//        currentNode.setAnimal("");
+//        currentNode.setQuestion(question);
+//        if ("yes".equalsIgnoreCase(answer.toLowerCase())) {
+//            currentNode.setYesBranch(node);
+//            currentNode.setNoBranch(oldNode);
+//        } else {
+//            currentNode.setYesBranch(oldNode);
+//            currentNode.setNoBranch(node);
+//        }
     }
 
     public void start() {
         state = "STARTED";
         _writer.output("think of an animal");
+    }
+
+    @Override
+    public String toString() {
+        return "AnimalQuiz{" +
+                "knowelegeTree=" + knowelegeTree +
+                ", currentNode=" + currentNode +
+                ", _writer=" + _writer +
+                ", _inputData=" + _inputData +
+                ", _animal='" + _animal + '\'' +
+                ", thoughtAnimal='" + thoughtAnimal + '\'' +
+                ", question='" + question + '\'' +
+                ", answer='" + answer + '\'' +
+                ", state='" + state + '\'' +
+                '}';
     }
 }
 

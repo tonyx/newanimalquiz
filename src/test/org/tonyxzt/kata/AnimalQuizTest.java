@@ -1,11 +1,17 @@
 package test.org.tonyxzt.kata;
 
+import com.sun.org.apache.xml.internal.dtm.ref.DTMDefaultBaseIterators;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.tonyzt.kata.AnimalQuiz;
 import org.tonyzt.kata.InStream;
 import org.tonyzt.kata.Node;
 import org.tonyzt.kata.OutStream;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -18,15 +24,6 @@ import static org.mockito.Mockito.*;
  */
 public class AnimalQuizTest {
     @Test
-    public void shouldAskToThinkOfAnAnimal() {
-        OutStream writer = mock(OutStream.class);
-        InStream inputData = mock(InStream.class);
-        AnimalQuiz animalQuiz = new AnimalQuiz(inputData, writer, "elefant");
-        animalQuiz.start();
-        verify(writer).output("think of an animal");
-    }
-
-    @Test
     public void when_starting_state_is_elefant_then_ask_if_it_was_an_elefant() {
         OutStream writer = mock(OutStream.class);
         InStream inputData = mock(InStream.class);
@@ -38,8 +35,9 @@ public class AnimalQuizTest {
     }
 
 
+
     @Test
-    public void guess_elefant_ask_if_it_was_it_then_the_answer_is_no_then_ask_what_it_was() {
+    public void when_thinking_a_mouse_then_should_ask_how_to_distinguish_mouse_from_elephant() {
         OutStream writer = mock(OutStream.class);
         InStream inputData = mock(InStream.class);
         Node node = mock(Node.class);
@@ -68,39 +66,6 @@ public class AnimalQuizTest {
 
 
     @Test
-    public void when_knowelege_base_is_elefant_and_mouse_first_question_is_the_discriminating_question() {
-        OutStream writer = mock(OutStream.class);
-        InStream inputData = mock(InStream.class);
-        Node elefant = mock(Node.class);
-        when(elefant.getAnimal()).thenReturn("elefant");
-        when(elefant.isLeaf()).thenReturn(true);
-
-        Node mouse = mock(Node.class);
-        when(mouse.getAnimal()).thenReturn("mouse");
-        when(mouse.isLeaf()).thenReturn(true);
-
-        Node root = mock(Node.class);
-        when(root.isLeaf()).thenReturn(false);
-        when(root.getQuestion()).thenReturn("Is it a big animal?");
-        when(root.getYesBranch()).thenReturn(elefant);
-        when(root.getNoBranch()).thenReturn(mouse);
-
-        AnimalQuiz animalQuiz = new AnimalQuiz(inputData, writer, root);
-
-        when(inputData.getInput()).thenReturn("No"); //.thenReturn("No").thenReturn("Yes");
-
-        animalQuiz.start();
-        verify(writer).output("think of an animal");
-        animalQuiz.step();
-
-        verify(writer).output("Is it a big animal?");
-        animalQuiz.step();
-
-        verify(writer).output("Is it a mouse?");
-    }
-
-
-    @Test
     public void when_knowelege_base_is_elefant_and_mouse_first_question_is_the_discriminating_question_then_guess_elefant() {
         OutStream writer = mock(OutStream.class);
         InStream inputData = mock(InStream.class);
@@ -120,35 +85,6 @@ public class AnimalQuizTest {
 
         AnimalQuiz animalQuiz = new AnimalQuiz(inputData, writer, root);
         when(inputData.getInput()).thenReturn("Yes"); //.thenReturn("No").thenReturn("Yes");
-
-        animalQuiz.start();
-        verify(writer).output("think of an animal");
-        animalQuiz.step();
-
-        verify(writer).output("Is it a big animal?");
-        animalQuiz.step();
-
-        verify(writer).output("Is it a elefant?");
-    }
-
-
-    @Test
-    public void when_knowelege_base_is_elefant_and_domain_objects_mouse_first_question_is_the_discriminating_question_then_guess_elefant() {
-        OutStream writer = mock(OutStream.class);
-        InStream inputData = mock(InStream.class);
-
-        Node elefant = new Node("elefant");
-        elefant.setLeaf(true);
-        Node mouse = new Node("mouse");
-        mouse.setLeaf(true);
-        Node root = new Node();
-        root.setLeaf(false);
-        root.setQuestion("Is it a big animal?");
-        root.setNoBranch(mouse);
-        root.setYesBranch(elefant);
-
-        AnimalQuiz animalQuiz = new AnimalQuiz(inputData, writer, root);
-        when(inputData.getInput()).thenReturn("Yes");
 
         animalQuiz.start();
         verify(writer).output("think of an animal");
@@ -189,30 +125,228 @@ public class AnimalQuizTest {
         verify(writer).output("Is it a elefant?");
     }
 
+    @Test
+    public void testNewConstructor() {
+        OutStream ouputData = mock(OutStream.class);
+        InStream inputData = mock(InStream.class);
+        Node root = new Node("Is it big?",new Node("elefant"),new Node("mouse"));
+        when(inputData.getInput()).thenReturn("No");
+        AnimalQuiz animalQuiz = new AnimalQuiz(inputData,ouputData,root);
+        animalQuiz.start();
+        verify(ouputData).output("think of an animal");
+        animalQuiz.step();
+        verify(ouputData).output("Is it big?");
+        animalQuiz.step();
+        verify(ouputData).output("Is it a mouse?");
+    }
 
     @Test
+    public void testOneLevelLearning() {
+        OutStream ouputData = mock(OutStream.class);
+        InStream inputData = mock(InStream.class);
+        Node root = new Node("elephant");
+        Node expectedAfterLearning = new Node("Is it big?",new Node("elephant"),new Node("mouse"));
+        AnimalQuiz animalQuiz = new AnimalQuiz(inputData,ouputData,root);
+        when(inputData.getInput()).thenReturn("No").thenReturn("mouse").thenReturn("Is it big?").thenReturn("No");
+        animalQuiz.start();
+        verify(ouputData).output("think of an animal");
+        animalQuiz.step();
+        verify(ouputData).output("Is it a elephant?");
+        animalQuiz.step();
+        verify(ouputData).output("What animal was?");
+        animalQuiz.step();
+        verify(ouputData).output("What question would you suggest to distinguish a elephant from a mouse?");
+        animalQuiz.step();
+        verify(ouputData).output("What should be the answer to the question \"Is it big?\" to indicate a mouse compared to a elephant?");
+        animalQuiz.step();
+
+        Assert.assertEquals(expectedAfterLearning, animalQuiz.getNode());
+    }
+
+    @Test
+    public void testTwoLevelLearning() {
+        OutStream ouputData = mock(OutStream.class);
+        InStream inputData = mock(InStream.class);
+        Node startNode = new Node("Is it big?",new Node("elephant"),new Node("mouse"));
+        Node expected = new Node("Is it big?",new Node("elephant"),new Node("Does it have 1000 legs?",new Node("worm"),new Node("mouse")));
+        AnimalQuiz animalQuiz = new AnimalQuiz(inputData,ouputData,startNode);
+        when(inputData.getInput()).thenReturn("No").thenReturn("No").thenReturn("worm").thenReturn("Does it have 1000 legs?").thenReturn("Yes");
+        animalQuiz.start();
+        verify(ouputData).output("think of an animal");
+        animalQuiz.step();
+        verify(ouputData).output("Is it big?");
+        animalQuiz.step();
+        verify(ouputData).output("Is it a mouse?");
+        animalQuiz.step();
+        verify(ouputData).output("What animal was?");
+        animalQuiz.step();
+        verify(ouputData).output("What question would you suggest to distinguish a mouse from a worm?");
+        animalQuiz.step();
+        verify(ouputData).output("What should be the answer to the question \"Does it have 1000 legs?\" to indicate a worm compared to a mouse?");
+        animalQuiz.step();
+
+        Assert.assertEquals(expected, animalQuiz.getNode());
+    }
+
+
+    @Test
+    public void testThreeLevelLearning() {
+        OutStream ouputData = mock(OutStream.class);
+        InStream inputData = mock(InStream.class);
+        Node startNode = new Node("Is it big?",new Node("elephant"),new Node("mouse"));
+        Node expected = new Node("Is it big?",new Node("elephant"),new Node("Does it have 1000 legs?",new Node("worm"),new Node("mouse")));
+        AnimalQuiz animalQuiz = new AnimalQuiz(inputData,ouputData,startNode);
+        when(inputData.getInput()).thenReturn("No").thenReturn("No").thenReturn("worm").thenReturn("Does it have 1000 legs?").thenReturn("Yes");
+        animalQuiz.start();
+        verify(ouputData).output("think of an animal");
+        animalQuiz.step();
+        verify(ouputData).output("Is it big?");
+        animalQuiz.step();
+        verify(ouputData).output("Is it a mouse?");
+        animalQuiz.step();
+        verify(ouputData).output("What animal was?");
+        animalQuiz.step();
+        verify(ouputData).output("What question would you suggest to distinguish a mouse from a worm?");
+        animalQuiz.step();
+        verify(ouputData).output("What should be the answer to the question \"Does it have 1000 legs?\" to indicate a worm compared to a mouse?");
+        animalQuiz.step();
+
+        Assert.assertEquals(expected, animalQuiz.getNode());
+        when(inputData.getInput()).thenReturn("No").thenReturn("Yes").thenReturn("No").thenReturn("microb").thenReturn("Is it microscopic?").thenReturn("Yes");
+
+        verify(ouputData).output("think of an animal");
+        animalQuiz.step();
+
+        //verify(ouputData).output("Is it big?");
+        animalQuiz.step();
+
+        verify(ouputData).output("Does it have 1000 legs?");
+        animalQuiz.step();
+
+        verify(ouputData).output("Is it a worm?");
+        animalQuiz.step();
+
+        verify(ouputData,times(2)).output("What animal was?");
+        animalQuiz.step();
+
+        verify(ouputData).output("What question would you suggest to distinguish a worm from a microb?");
+        animalQuiz.step();
+
+        verify(ouputData).output("What should be the answer to the question \"Is it microscopic?\" to indicate a microb compared to a worm?");
+        animalQuiz.step();
+    }
+
+
+    @Test
+    public void testOneLevelLearningOnDomainModel() {
+        Node root = new Node("elephant");
+        Node expectedAfterLearning = new Node("Is it big?",new Node("elephant"),new Node("mouse"));
+
+        List<String> aList = new ArrayList<String>();
+        aList.add("No");
+        Node nodeResulted = root.arrangeByPath(new ArrayList<String>(),"mouse","Is it big?","No");
+        Assert.assertEquals(expectedAfterLearning,nodeResulted);
+    }
+
+    @Test
+    public void testOneLevelLearningOnTree2() {
+        Node root = new Node("elephant");
+        Node expectedAfterLearning = new Node("Is it small?",new Node("mouse"),new Node("elephant"));
+
+        List<String> aList = new ArrayList<String>();
+        aList.add("No");
+        Node nodeResulted = root.arrangeByPath(new ArrayList<String>(),"mouse","Is it small?","Yes");
+        Assert.assertEquals(expectedAfterLearning,nodeResulted);
+
+    }
+
+
+    @Test
+    public void testTwoLevelLearningOnTree() {
+        Node node = new Node("Is it small?",new Node("mouse"),new Node("elephant"));
+        Node expectedAfterLearning = new Node("Is it small?",new Node("Does it have 1000 legs?",new Node("worm"),new Node("mouse")),
+                new Node("elephant"));
+
+        List<String> aList = new ArrayList<String>();
+        aList.add("Yes");
+        Node nodeResulted = node.arrangeByPath(aList,"worm","Does it have 1000 legs?","Yes");
+        Assert.assertEquals(expectedAfterLearning,nodeResulted);
+    }
+
+
+    @Test
+    public void testThreeLevelLearningOnTree() {
+       Node node = new Node("Is it small?",new Node("Does it have 1000 legs?",new Node("worm"),new Node("mouse")),
+                new Node("elephant"));
+        Node expectedAfterLearning = new Node("Is it small?",new Node("Does it have 1000 legs?",new Node("Is it microscopic?",new Node("microb"),new Node("worm")),new Node("mouse")),
+                new Node("elephant"));
+        List<String> aList = new ArrayList<String>();
+        aList.add("Yes");
+        aList.add("Yes");
+        Node nodeResulted = node.arrangeByPath(aList,"microb","Is it microscopic?","Yes");
+        Assert.assertEquals(expectedAfterLearning,nodeResulted);
+    }
+
+
+    @Test
+    public void testNewConstructor2() {
+        OutStream ouputData = mock(OutStream.class);
+        InStream inputData = mock(InStream.class);
+        Node root = new Node("Is it big?",new Node("elefant"),new Node("Does it have 1000 legs?",new Node("worm"),new Node("mouse")));
+        when(inputData.getInput()).thenReturn("No","Yes");
+
+        AnimalQuiz animalQuiz = new AnimalQuiz(inputData,ouputData,root);
+
+        animalQuiz.start();
+        verify(ouputData).output("think of an animal");
+        animalQuiz.step();
+
+        verify(ouputData).output("Is it big?");
+        animalQuiz.step();
+
+        verify(ouputData).output("Does it have 1000 legs?");
+        animalQuiz.step();
+
+        verify(ouputData).output("Is it a worm?");
+        animalQuiz.step();
+    }
+
+
+
+    @Test
+    public void testNodeEquality() {
+        Node node1 = new Node();
+        Node node2 = new Node();
+        Assert.assertEquals(node1,node2);
+    }
+
+    @Test
+    public void testNodeEquality2() {
+        Node root = new Node("Is it big?",new Node("elefant"),new Node("Does it have 1000 legs?",new Node("worm"),new Node("mouse")));
+        Node root2 = new Node("Is it big?",new Node("elefant"),new Node("Does it have 1000 legs?",new Node("worm"),new Node("mouse")));
+        Assert.assertEquals(root,root2);
+    }
+
+
+    @Test
+    @Ignore
     public void deeperLevel_knowelege_tree() {
         OutStream writer = mock(OutStream.class);
         InStream inputData = mock(InStream.class);
 
         Node elefant = new Node("elefant");
         elefant.setLeaf(true);
-
         Node mouse = new Node("mouse");
         mouse.setLeaf(true);
-
         Node bird = new Node("bird");
         mouse.setLeaf(true);
-
         Node root = new Node();
         root.setLeaf(false);
-
         Node subRoot = new Node();
         subRoot.setLeaf(false);
         subRoot.setQuestion("Does it fly?");
         subRoot.setNoBranch(mouse);
         subRoot.setYesBranch(bird);
-
         root.setQuestion("Is it a big animal?");
         root.setYesBranch(elefant);
         root.setNoBranch(subRoot);
@@ -229,6 +363,7 @@ public class AnimalQuizTest {
 
         verify(writer).output("Does it fly?");
     }
+
 
 
 
@@ -316,11 +451,67 @@ public class AnimalQuizTest {
         verify(writer,times(2)).output("think of an animal");
         animalQuiz.step();
 
+        verify(writer,times(1)).output("Is it a big animal?");
+        animalQuiz.step();
+
+        verify(writer).output("Is it a mouse?");
+        animalQuiz.start();
+
+        verify(writer,times(3)).output("think of an animal");
+        animalQuiz.step();
+
+        verify(writer,times(2)).output("Is it a big animal?");
+        animalQuiz.step();
+
+        verify(writer).output("Is it a mouse?");
+        animalQuiz.step();
+
+        verify(writer).output("What animal was?");
+        animalQuiz.step();
+
+//        verify(writer).output("What question would you suggest to distinguish a worm from a mouse?");
+//        animalQuiz.step();
+    }
+
+    @Test
+    @Ignore
+    public void knowelege_base_deep() {
+        OutStream writer = mock(OutStream.class);
+        InStream inputData = mock(InStream.class);
+
+        Node root = new Node("elefant");
+        root.setLeaf(true);
+
+
+        AnimalQuiz animalQuiz = new AnimalQuiz(inputData, writer, root);
+        when(inputData.getInput()).thenReturn("No").thenReturn("mouse").thenReturn("Is it a big animal?").thenReturn("no").thenReturn("no").thenReturn("worm").thenReturn("is it an insect?");//.thenReturn("yes");
+
+
+        animalQuiz.start();
+        verify(writer).output("think of an animal");
+        animalQuiz.step();
+
+        verify(writer).output("Is it a elefant?");
+        animalQuiz.step();
+
+        verify(writer).output("What animal was?"); // mouse
+        animalQuiz.step();
+
+        verify(writer).output("What question would you suggest to distinguish a elefant from a mouse?");
+        animalQuiz.step();
+
+        verify(writer).output("What should be the answer to the question \"Is it a big animal?\" to indicate a mouse compared to a elefant?");
+        animalQuiz.start();
+
+        verify(writer,times(2)).output("think of an animal");
+        animalQuiz.step();
+
         verify(writer,times(2)).output("Is it a big animal?");
         animalQuiz.step();
 
         verify(writer).output("Is it a mouse?");
         animalQuiz.start();
+
 
         verify(writer,times(3)).output("think of an animal");
         animalQuiz.step();
@@ -334,36 +525,15 @@ public class AnimalQuizTest {
         verify(writer).output("What animal was?");
         animalQuiz.step();
 
-        verify(writer).output("What question would you suggest to distinguish a worm from a mouse?");
-        animalQuiz.step();
-
+//        verify(writer).output("What question would you suggest to distinguish a worm from a mouse?");
+//        animalQuiz.step();
     }
 
 
-    @Test
-    @Ignore
-    public void after_learnt_a_mouse_can_guess_if_was_elefant_or_mouse() {
-        OutStream writer = mock(OutStream.class);
-        InStream inputData = mock(InStream.class);
 
-        AnimalQuiz animalQuiz = new AnimalQuiz(inputData, writer, "elefant");
-        when(inputData.getInput()).thenReturn("No").thenReturn("mouse").thenReturn("Is it a big animal?").thenReturn("No");
 
-        animalQuiz.start();
-        verify(writer).output("think of an animal");
-        animalQuiz.step();
-        verify(writer).output("was it a elefant?");
-        animalQuiz.step();
-        verify(writer).output("what animal was it?");
-        animalQuiz.step();
-        verify(writer).output("what question will you suggest to distinguish a elefant from a mouse?");
-        animalQuiz.step();
-        verify(writer).output("and what the answer would be?");
-        animalQuiz.step();
 
-        verify(writer).output("think of an animal");
 
-    }
 
 
 }
