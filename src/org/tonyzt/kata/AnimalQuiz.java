@@ -20,7 +20,6 @@ public class AnimalQuiz {
 
     OutStream _writer;
     InStream _inputData;
-    String _animal;
     String thoughtAnimal;
     String question;
     String answer;
@@ -29,14 +28,14 @@ public class AnimalQuiz {
 
     public AnimalQuiz(InStream inputData, OutStream writer,String animal) {
         _inputData=inputData;
-        _animal=animal;
-        knowelegeTree = new Node(_animal);
+       // _animal=animal;
+        knowelegeTree = new Node(animal);
         _writer = writer;
     }
 
     public AnimalQuiz(InStream inputData, OutStream writer,Node node) {
         _inputData=inputData;
-        _animal=node.getAnimal();
+//        _animal=node.getAnimal();
         knowelegeTree = node;
         _writer = writer;
     }
@@ -62,7 +61,7 @@ public class AnimalQuiz {
             }
         };
         knowelegeTree= new Node("elefant");
-        _animal="elefant";
+       // _animal="elefant";
         knowelegeTree.setLeaf(true);
     }
 
@@ -90,7 +89,15 @@ public class AnimalQuiz {
         if ("GUESSING".equals(state)) {
             String answer =_inputData.getInput();
             this.answersList.add(answer);
-            Node node = ("no".equalsIgnoreCase(answer)?currentNode.getNoBranch():currentNode.getYesBranch());
+            Node node=null;
+            if ("no".equalsIgnoreCase(answer)) {
+                 node = currentNode.getNoBranch();
+            } else
+            if ("yes".equalsIgnoreCase(answer)) {
+                 node = currentNode.getYesBranch();
+            } else
+                return;
+            //Node node = ("no".equalsIgnoreCase(answer)?currentNode.getNoBranch():currentNode.getYesBranch());
             if (node.isLeaf())  {
                 _writer.output("Is it a "+node.getAnimal()+"?");
                 state = "GUESS_MADE";
@@ -103,14 +110,17 @@ public class AnimalQuiz {
         }
         if ("GUESS_MADE".equals(state)) {
             String confirmation = this._inputData.getInput();
+
             if ("no".equalsIgnoreCase(confirmation)) {
                 _writer.output("What animal was?");
                 thoughtAnimal = _inputData.getInput();
                 state = "THOUGHT_ANIMAL_STORED";
-            } else {
-                _writer.output("yeah");
-                state="STARTED";
-            }
+            } else
+                if ("yes".equalsIgnoreCase(confirmation)) {
+                     _writer.output("yeah");
+                    state="STARTED";
+                }
+            else _writer.output("yes or not");
             return;
         }
         if ("THOUGHT_ANIMAL_STORED".equals(state)) {
@@ -138,20 +148,6 @@ public class AnimalQuiz {
     {
         Node node = knowelegeTree.arrangeByPath(this.answersList,animal,question,answer);
         knowelegeTree=node;
-
-
-//        Node node = new Node(animal);
-//        Node oldNode = new Node(currentNode.getAnimal());
-//        currentNode.setLeaf(false);
-//        currentNode.setAnimal("");
-//        currentNode.setQuestion(question);
-//        if ("yes".equalsIgnoreCase(answer.toLowerCase())) {
-//            currentNode.setYesBranch(node);
-//            currentNode.setNoBranch(oldNode);
-//        } else {
-//            currentNode.setYesBranch(oldNode);
-//            currentNode.setNoBranch(node);
-//        }
     }
 
     public void start() {
@@ -166,7 +162,6 @@ public class AnimalQuiz {
                 ", currentNode=" + currentNode +
                 ", _writer=" + _writer +
                 ", _inputData=" + _inputData +
-                ", _animal='" + _animal + '\'' +
                 ", thoughtAnimal='" + thoughtAnimal + '\'' +
                 ", question='" + question + '\'' +
                 ", answer='" + answer + '\'' +

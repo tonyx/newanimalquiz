@@ -1,5 +1,6 @@
 package test.org.tonyxzt.kata;
 
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import com.sun.org.apache.xml.internal.dtm.ref.DTMDefaultBaseIterators;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -11,7 +12,9 @@ import org.tonyzt.kata.Node;
 import org.tonyzt.kata.OutStream;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Mockito.*;
 
@@ -24,7 +27,7 @@ import static org.mockito.Mockito.*;
  */
 public class AnimalQuizTest {
     @Test
-    public void when_starting_state_is_elefant_then_ask_if_it_was_an_elefant() {
+    public void when_starting_state_is_elefant_then_first_question_is_if_it_is_elefant() {
         OutStream writer = mock(OutStream.class);
         InStream inputData = mock(InStream.class);
         AnimalQuiz animalQuiz = new AnimalQuiz(inputData, writer, "elefant");
@@ -35,9 +38,8 @@ public class AnimalQuizTest {
     }
 
 
-
     @Test
-    public void when_thinking_a_mouse_then_should_ask_how_to_distinguish_mouse_from_elephant() {
+    public void when_thinking_about_a_mouse_then_should_ask_how_to_distinguish_mouse_from_elephant() {
         OutStream writer = mock(OutStream.class);
         InStream inputData = mock(InStream.class);
         Node node = mock(Node.class);
@@ -57,13 +59,43 @@ public class AnimalQuizTest {
 
         verify(writer).output("What animal was?");
         animalQuiz.step();
-
         verify(writer).output("What question would you suggest to distinguish a elefant from a mouse?");
         animalQuiz.step();
-
         verify(writer).output("What should be the answer to the question \"Is it a big animal\" to indicate a mouse compared to a elefant?");
     }
 
+    @Test
+    @Ignore
+    public void answers_different_from_no_and_yes_should_not_be_allowed() {
+        OutStream writer = mock(OutStream.class);
+        InStream inputData = mock(InStream.class);
+        Node node = mock(Node.class);
+        when(node.getAnimal()).thenReturn("elefant");
+        when(node.isLeaf()).thenReturn(true);
+
+        AnimalQuiz animalQuiz = new AnimalQuiz(inputData, writer, node);
+
+        when(inputData.getInput()).thenReturn("Ni").thenReturn("No");//.thenReturn("mouse").thenReturn("Is it a big animal").thenReturn("No");
+
+        animalQuiz.start();
+        verify(writer).output("think of an animal");
+        animalQuiz.step();
+
+//        verify(writer).output("Is it a elefant?");
+//        animalQuiz.step();
+
+        animalQuiz.step();
+        animalQuiz.step();
+        verify(writer,times(2)).output("Is it a elefant?");
+
+//        verify(writer).output("What animal was?");
+//        animalQuiz.step();
+//
+//        verify(writer).output("What question would you suggest to distinguish a elefant from a mouse?");
+//        animalQuiz.step();
+//
+//        verify(writer).output("What should be the answer to the question \"Is it a big animal\" to indicate a mouse compared to a elefant?");
+    }
 
     @Test
     public void when_knowelege_base_is_elefant_and_mouse_first_question_is_the_discriminating_question_then_guess_elefant() {
@@ -184,7 +216,6 @@ public class AnimalQuizTest {
         animalQuiz.step();
         verify(ouputData).output("What should be the answer to the question \"Does it have 1000 legs?\" to indicate a worm compared to a mouse?");
         animalQuiz.step();
-
         Assert.assertEquals(expected, animalQuiz.getNode());
     }
 
@@ -210,31 +241,43 @@ public class AnimalQuizTest {
         animalQuiz.step();
         verify(ouputData).output("What should be the answer to the question \"Does it have 1000 legs?\" to indicate a worm compared to a mouse?");
         animalQuiz.step();
-
         Assert.assertEquals(expected, animalQuiz.getNode());
         when(inputData.getInput()).thenReturn("No").thenReturn("Yes").thenReturn("No").thenReturn("microb").thenReturn("Is it microscopic?").thenReturn("Yes");
-
         verify(ouputData).output("think of an animal");
         animalQuiz.step();
-
         //verify(ouputData).output("Is it big?");
         animalQuiz.step();
-
         verify(ouputData).output("Does it have 1000 legs?");
         animalQuiz.step();
-
         verify(ouputData).output("Is it a worm?");
         animalQuiz.step();
-
         verify(ouputData,times(2)).output("What animal was?");
         animalQuiz.step();
-
         verify(ouputData).output("What question would you suggest to distinguish a worm from a microb?");
         animalQuiz.step();
-
         verify(ouputData).output("What should be the answer to the question \"Is it microscopic?\" to indicate a microb compared to a worm?");
         animalQuiz.step();
     }
+
+
+    @Test
+    @Ignore
+    public void recursiveTestAllNo() {
+        OutStream outputData = mock(OutStream.class);
+        InStream inputData = mock(InStream.class);
+        AnimalQuiz animalQuiz = new AnimalQuiz(inputData,outputData, new Node("elephant"));
+        String[] animals = {"mouse","cat","bird","bat"};
+        String[] answers = {"no","no","no","no"};
+        String[] questions = {"is it big?","is it dirty?","does it miao?"};
+        animalQuiz.start();
+        verify(outputData).output("think of an animal");
+        animalQuiz.step();
+        verify(outputData).output("is it a elephant?");
+        //animalQuiz.step();
+        //verify(outputData).output("what animal was?");
+    }
+
+
 
 
     @Test
@@ -257,7 +300,6 @@ public class AnimalQuizTest {
         aList.add("No");
         Node nodeResulted = root.arrangeByPath(new ArrayList<String>(),"mouse","Is it small?","Yes");
         Assert.assertEquals(expectedAfterLearning,nodeResulted);
-
     }
 
 

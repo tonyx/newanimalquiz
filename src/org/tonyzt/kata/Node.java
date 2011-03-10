@@ -118,8 +118,8 @@ public class Node {
 
     public Node arrangeByPath(List<String> strings, String newAnimal, String question, String yesNoAnswer) {
         if (strings.size()==0) {
-        Node node = (yesNoAnswer.equalsIgnoreCase("no")?new Node(question,new Node(this.animal),new Node(newAnimal)):
-            new Node(question,new Node(newAnimal), new Node(this.animal)));
+            Node node = (yesNoAnswer.equalsIgnoreCase("no")?new Node(question,new Node(this.animal),new Node(newAnimal)):
+                new Node(question,new Node(newAnimal), new Node(this.animal)));
             return node;
         }
 
@@ -128,6 +128,6 @@ public class Node {
 
         return (head.equalsIgnoreCase("Yes")? new Node(this.question,this.getYesBranch().arrangeByPath(tail,newAnimal,question,yesNoAnswer),this.getNoBranch()):
                 new Node(this.question,this.getYesBranch(),this.getNoBranch().arrangeByPath(tail,newAnimal,question,yesNoAnswer)));
-
     }
 }
+
