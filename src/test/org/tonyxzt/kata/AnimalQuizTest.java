@@ -11,10 +11,7 @@ import org.tonyzt.kata.InStream;
 import org.tonyzt.kata.Node;
 import org.tonyzt.kata.OutStream;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 
@@ -260,21 +257,73 @@ public class AnimalQuizTest {
     }
 
 
+
+
+
     @Test
     @Ignore
-    public void recursiveTestAllNo() {
+    public void spike() {
         OutStream outputData = mock(OutStream.class);
         InStream inputData = mock(InStream.class);
-        AnimalQuiz animalQuiz = new AnimalQuiz(inputData,outputData, new Node("elephant"));
-        String[] animals = {"mouse","cat","bird","bat"};
-        String[] answers = {"no","no","no","no"};
-        String[] questions = {"is it big?","is it dirty?","does it miao?"};
+
+        Node root = new Node("animal");
+    //    root = root.arrangeByPath()
+        Node noBranch = new Node("answer no");
+        Node yesBranch = new Node("answer yes");
+        root.arrangeByPath(Arrays.asList("Yes"),"animal yes 1","is it yes 1?","Yes");
+
+        AnimalQuiz animalQuiz = new AnimalQuiz(inputData,outputData,root);
+        when(inputData.getInput()).thenReturn("yes");
         animalQuiz.start();
         verify(outputData).output("think of an animal");
         animalQuiz.step();
-        verify(outputData).output("is it a elephant?");
-        //animalQuiz.step();
-        //verify(outputData).output("what animal was?");
+        verify(outputData).output("Is it 0?");
+        animalQuiz.step();
+        verify(outputData).output("Is it animal yes 1?");
+
+
+
+
+//        AnimalQuiz animalQuiz = new AnimalQuiz(inputData,outputData, new Node("elephant"));
+
+
+//        when(inputData.getInput()).thenReturn("No").
+//                thenReturn("mouse").thenReturn("Is it small?").thenReturn("Yes").
+//                thenReturn("Yes").thenReturn("No").
+//                thenReturn("worm").thenReturn("Does it have 1000 foots?").thenReturn("Yes").
+//                thenReturn("Yes").thenReturn("No").thenReturn("No").
+//                thenReturn("microb").thenReturn("Is it microscopic?");
+//        ;
+//
+//        animalQuiz.start();
+//        verify(outputData).output("think of an animal");
+//        animalQuiz.step();
+//        verify(outputData).output("Is it a elephant?");
+//        animalQuiz.step();
+//        //verify(outputData).output("What animal was?");
+//        animalQuiz.step();
+//        verify(outputData).output("What question would you suggest to distinguish a elephant from a mouse?");
+//        animalQuiz.step();
+//        verify(outputData).output("What should be the answer to the question \"Is it small?\" to indicate a mouse compared to a elephant?");
+//        animalQuiz.step();
+//        verify(outputData).output("Is it small?");
+//        animalQuiz.step();
+//        verify(outputData).output("Is it a mouse?");
+//        animalQuiz.step();
+//        verify(outputData,times(2)).output("What animal was?");
+//        animalQuiz.step();
+//        verify(outputData).output("What question would you suggest to distinguish a mouse from a worm?");
+//        animalQuiz.step();
+//        verify(outputData).output("What should be the answer to the question \"Does it have 1000 foots?\" to indicate a worm compared to a mouse?");
+//        animalQuiz.step();
+//        verify(outputData,times(2)).output("Is it small?");
+//        animalQuiz.step();
+//        verify(outputData,times(1)).output("Does it have 1000 foots?");
+//        animalQuiz.step();
+//        verify(outputData).output("What should be the answer to the question \"Is it microscopic?\" to indicate a microb compared to a worm?");
+//        animalQuiz.step();
+
+
     }
 
 
