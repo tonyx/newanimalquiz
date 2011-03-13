@@ -262,71 +262,109 @@ public class AnimalQuizTest {
 
     @Test
     @Ignore
-    public void spike() {
+    public void modelDeepYes() {
         OutStream outputData = mock(OutStream.class);
         InStream inputData = mock(InStream.class);
-
-        Node root = new Node("animal");
-    //    root = root.arrangeByPath()
-        Node noBranch = new Node("answer no");
-        Node yesBranch = new Node("answer yes");
-        root.arrangeByPath(Arrays.asList("Yes"),"animal yes 1","is it yes 1?","Yes");
-
-        AnimalQuiz animalQuiz = new AnimalQuiz(inputData,outputData,root);
-        when(inputData.getInput()).thenReturn("yes");
+        Node root = new Node("elephant");
+        int deep=2;
+        List<String> answersList = new ArrayList<String>();
+        for (int i= 1; i<=deep;i++,answersList.add("yes")) {
+            root = root.arrangeByPath(answersList,"yes "+i,"Is it question for yes "+i+"?","Yes");
+        }
+        AnimalQuiz animalQuiz  = new AnimalQuiz(inputData,outputData,root);
         animalQuiz.start();
+        animalQuiz.step();
+        when(inputData.getInput()).thenReturn("Yes");//.thenReturn("yes");
+        //when(inputData.getInput()).thenReturn("No").thenReturn("No");//.thenReturn("No");
+        for (int i=0;i<=deep;i++) {
+            animalQuiz.step();
+        }
+
         verify(outputData).output("think of an animal");
-        animalQuiz.step();
-        verify(outputData).output("Is it 0?");
-        animalQuiz.step();
-        verify(outputData).output("Is it animal yes 1?");
-
-
-
-
-//        AnimalQuiz animalQuiz = new AnimalQuiz(inputData,outputData, new Node("elephant"));
-
-
-//        when(inputData.getInput()).thenReturn("No").
-//                thenReturn("mouse").thenReturn("Is it small?").thenReturn("Yes").
-//                thenReturn("Yes").thenReturn("No").
-//                thenReturn("worm").thenReturn("Does it have 1000 foots?").thenReturn("Yes").
-//                thenReturn("Yes").thenReturn("No").thenReturn("No").
-//                thenReturn("microb").thenReturn("Is it microscopic?");
-//        ;
-//
-//        animalQuiz.start();
-//        verify(outputData).output("think of an animal");
-//        animalQuiz.step();
-//        verify(outputData).output("Is it a elephant?");
-//        animalQuiz.step();
-//        //verify(outputData).output("What animal was?");
-//        animalQuiz.step();
-//        verify(outputData).output("What question would you suggest to distinguish a elephant from a mouse?");
-//        animalQuiz.step();
-//        verify(outputData).output("What should be the answer to the question \"Is it small?\" to indicate a mouse compared to a elephant?");
-//        animalQuiz.step();
-//        verify(outputData).output("Is it small?");
-//        animalQuiz.step();
-//        verify(outputData).output("Is it a mouse?");
-//        animalQuiz.step();
-//        verify(outputData,times(2)).output("What animal was?");
-//        animalQuiz.step();
-//        verify(outputData).output("What question would you suggest to distinguish a mouse from a worm?");
-//        animalQuiz.step();
-//        verify(outputData).output("What should be the answer to the question \"Does it have 1000 foots?\" to indicate a worm compared to a mouse?");
-//        animalQuiz.step();
-//        verify(outputData,times(2)).output("Is it small?");
-//        animalQuiz.step();
-//        verify(outputData,times(1)).output("Does it have 1000 foots?");
-//        animalQuiz.step();
-//        verify(outputData).output("What should be the answer to the question \"Is it microscopic?\" to indicate a microb compared to a worm?");
-//        animalQuiz.step();
-
+        int i;
+        for (i=1;i<=deep;i++) {
+            verify(outputData).output("Is it question for yes "+1+"?");
+        }
+        verify(outputData).output("Is it a yes "+(i-1)+"?");
+        //verify(outputData).output("Is it a no "+(deep)+"?");
+        verify(outputData).output("yeah");
 
     }
 
+    @Test
+    @Ignore
+    public void modelDeepNo() {
+        OutStream outputData = mock(OutStream.class);
+        InStream inputData = mock(InStream.class);
+        Node root = new Node("elephant");
+        int deep = 10;
+        List<String> answersList = new ArrayList<String>();
+        for (int i = 1; i <= deep; i++, answersList.add("no")) {
+            root = root.arrangeByPath(answersList, "no " + i, "Is it question for no " + i + "?", "no");
+        }
+        AnimalQuiz animalQuiz = new AnimalQuiz(inputData, outputData, root);
+        animalQuiz.start();
+        animalQuiz.step();
+        when(inputData.getInput()).thenReturn("no");//.thenReturn("no").thenReturn("no");//.thenReturn("no");
+        for (int i = 0; i <= deep; i++) {
+            animalQuiz.step();
+        }
 
+        verify(outputData).output("think of an animal");
+
+        int i;
+        for (i = 1; i <= deep; i++) {
+            verify(outputData).output("Is it question for no " + 1 + "?");
+        }
+        verify(outputData).output("Is it a no " + (i - 1) + "?");
+    }
+
+
+    @Test
+    @Ignore
+    public void modelDeepYesOrNo() {
+        OutStream outputData = mock(OutStream.class);
+        InStream inputData = mock(InStream.class);
+        Node root = new Node("elephant");
+        int deep = 3;
+        String theAnswer="yes";
+
+        String[] yesNoList = new String[deep+2];
+        yesNoList[0]="";
+        yesNoList[1]="yes";
+        yesNoList[2]="yes";
+        yesNoList[3]="yes";
+//        for (int i=1;i<=deep;i++) {
+//            //yesNoList[i]="no";
+//            yesNoList[i]=theAnswer;
+//        }
+
+        List<String> answersList = new ArrayList<String>();
+        for (int i = 2; i <= deep; i++) {
+            //root = root.arrangeByPath(answersList, "no " + i, "Is it question for no " + i + "?", "no");
+            root = root.arrangeByPath(answersList, theAnswer+" " + i, "Is it question for no " + yesNoList[i]+ i + "?", theAnswer);
+            answersList.add(yesNoList[i]);
+
+        }
+
+        AnimalQuiz animalQuiz = new AnimalQuiz(inputData, outputData, root);
+        animalQuiz.start();
+        animalQuiz.step();
+        //when(inputData.getInput()).thenReturn(theAnswer);//.thenReturn("no").thenReturn("no");//.thenReturn("no");
+        //when(inputData.getInput()).thenReturn("yes").thenReturn("no");//.thenReturn("no").thenReturn("no");//.thenReturn("no");
+        when(inputData.getInput()).thenReturn("no");
+        for (int i = 0; i <= deep; i++) {
+            animalQuiz.step();
+        }
+
+        verify(outputData).output("think of an animal");
+
+        System.out.println(root.toString());
+        int i;
+        for (i = 2; i <= deep; i++) {
+            verify(outputData).output("Is it question for no " + yesNoList[i] +i + "?");
+        }
+    }
 
 
     @Test
