@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import static org.tonyzt.kata.AnimalQuiz.States.*;
 
 
 /**
@@ -15,6 +16,8 @@ import java.util.Scanner;
 public class AnimalQuiz {
     private List<String> answersList = new ArrayList<String>();
 
+    enum States  {STARTED,NOT_STARTED,GUESS_MADE,GUESSING,THOUGHT_ANIMAL_STORED,GETTING_QUESTION,GETTING_ANSWER, ADDING_KNOWLEDGE};
+
     Node knowelegeTree;
     Node currentNode;
 
@@ -24,7 +27,8 @@ public class AnimalQuiz {
     String question;
     String answer;
 
-    private String state = "NOT_STARTED";
+    //private String state = "NOT_STARTED";
+    private States state = NOT_STARTED;
 
     public AnimalQuiz(InStream inputData, OutStream writer,String animal) {
         _inputData=inputData;
@@ -61,7 +65,6 @@ public class AnimalQuiz {
             }
         };
         knowelegeTree= new Node("elefant");
-       // _animal="elefant";
         knowelegeTree.setLeaf(true);
     }
 
@@ -74,19 +77,19 @@ public class AnimalQuiz {
     }
 
     public void step() {
-        if ("STARTED".equals(state)) {
+        if (state==STARTED) {
             this.answersList=new ArrayList<String>();
             currentNode=knowelegeTree;
             if (knowelegeTree.isLeaf()) {
                 _writer.output("Is it a "+knowelegeTree.getAnimal()+"?");
-                state="GUESS_MADE";
+                state=States.GUESS_MADE;
             } else {
-                state="GUESSING";
+                state=GUESSING;
                 _writer.output(knowelegeTree.getQuestion());
             }
             return;
         }
-        if ("GUESSING".equals(state)) {
+        if (state == GUESSING) {
             String answer =_inputData.getInput();
             this.answersList.add(answer);
             Node node=null;
@@ -97,10 +100,9 @@ public class AnimalQuiz {
                  node = currentNode.getYesBranch();
             } else
                 return;
-            //Node node = ("no".equalsIgnoreCase(answer)?currentNode.getNoBranch():currentNode.getYesBranch());
             if (node.isLeaf())  {
                 _writer.output("Is it a "+node.getAnimal()+"?");
-                state = "GUESS_MADE";
+                state = GUESS_MADE;
                 currentNode= node;
             } else {
                 _writer.output(node.getQuestion());
@@ -108,38 +110,38 @@ public class AnimalQuiz {
             }
             return;
         }
-        if ("GUESS_MADE".equals(state)) {
+        if (state ==GUESS_MADE) {
             String confirmation = this._inputData.getInput();
 
             if ("no".equalsIgnoreCase(confirmation)) {
                 _writer.output("What animal was?");
                 thoughtAnimal = _inputData.getInput();
-                state = "THOUGHT_ANIMAL_STORED";
+                state = THOUGHT_ANIMAL_STORED;
             } else
                 if ("yes".equalsIgnoreCase(confirmation)) {
                      _writer.output("yeah");
-                    state="STARTED";
+                    state=STARTED;
                 }
             else _writer.output("yes or not");
             return;
         }
-        if ("THOUGHT_ANIMAL_STORED".equals(state)) {
+        if (state ==THOUGHT_ANIMAL_STORED) {
             _writer.output("What question would you suggest to distinguish a "+currentNode.getAnimal()+" from a "+thoughtAnimal+"?");
             question = _inputData.getInput();
-            state = "GETTING_ANSWER";
+            state = GETTING_ANSWER;
             return;
         }
-        if ("GETTING_QUESTION".equals(state)) {
-            question = _inputData.getInput();
-            state = "GETTING_ANSWER";
-            return;
-        }
-        if ("GETTING_ANSWER".equals(state)) {
+//        if (state ==GETTING_QUESTION) {
+//            question = _inputData.getInput();
+//            state = GETTING_ANSWER;
+//            return;
+//        }
+        if (state == GETTING_ANSWER) {
             _writer.output("What should be the answer to the question \""+question+"\" "+"to indicate a "+thoughtAnimal+" compared to a "+currentNode.getAnimal()+"?");
             answer = _inputData.getInput();
-            state = "ADDING_KNOWELEGE";
+            state = States.ADDING_KNOWLEDGE;
             add_knowlege(question,answer,thoughtAnimal);
-            state = "STARTED";
+            state = STARTED;
             return;
         }
     }
@@ -151,7 +153,7 @@ public class AnimalQuiz {
     }
 
     public void start() {
-        state = "STARTED";
+        state = STARTED;
         _writer.output("think of an animal");
     }
 
