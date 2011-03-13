@@ -15,8 +15,9 @@ import static org.tonyzt.kata.AnimalQuiz.States.*;
  */
 public class AnimalQuiz {
     private List<String> answersList = new ArrayList<String>();
+    StateContext sc = new StateContext();
 
-    enum States  {STARTED,NOT_STARTED,GUESS_MADE,GUESSING,THOUGHT_ANIMAL_STORED,GETTING_QUESTION,GETTING_ANSWER, ADDING_KNOWLEDGE};
+    enum States  {STARTED,NOT_STARTED,GUESS_MADE,GUESSING,THOUGHT_ANIMAL_STORED,GETTING_ANSWER, ADDING_KNOWLEDGE};
 
     Node knowelegeTree;
     Node currentNode;
@@ -74,6 +75,10 @@ public class AnimalQuiz {
         while(true) {
             animalQuiz.step();
         }
+    }
+
+    public void newStep() {
+        sc.step(_inputData,_writer);
     }
 
     public void step() {
@@ -157,19 +162,19 @@ public class AnimalQuiz {
         _writer.output("think of an animal");
     }
 
-    @Override
-    public String toString() {
-        return "AnimalQuiz{" +
-                "knowelegeTree=" + knowelegeTree +
-                ", currentNode=" + currentNode +
-                ", _writer=" + _writer +
-                ", _inputData=" + _inputData +
-                ", thoughtAnimal='" + thoughtAnimal + '\'' +
-                ", question='" + question + '\'' +
-                ", answer='" + answer + '\'' +
-                ", state='" + state + '\'' +
-                '}';
-    }
+//    @Override
+//    public String toString() {
+//        return "AnimalQuiz{" +
+//                "knowelegeTree=" + knowelegeTree +
+//                ", currentNode=" + currentNode +
+//                ", _writer=" + _writer +
+//                ", _inputData=" + _inputData +
+//                ", thoughtAnimal='" + thoughtAnimal + '\'' +
+//                ", question='" + question + '\'' +
+//                ", answer='" + answer + '\'' +
+//                ", state='" + state + '\'' +
+//                '}';
+//    }
 }
 
 
