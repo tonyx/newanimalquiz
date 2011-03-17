@@ -13,36 +13,34 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class Node {
+    private String question;
     public void setQuestion(String question) {
         this.question = question;
     }
 
-    private String question;
 
+    private String animal;
     public void setAnimal(String animal) {
         this.animal = animal;
     }
 
-    private String animal;
 
+    private Node yesBranch;
     public void setYesBranch(Node yesBranch) {
         this.yesBranch = yesBranch;
     }
 
+    private Node noBranch;
     public void setNoBranch(Node noBranch) {
         this.noBranch = noBranch;
     }
 
-    private Node yesBranch;
-    private Node noBranch;
 
-
+    private boolean isLeaf = true;
     public void setLeaf(boolean leaf) {
         isLeaf = leaf;
     }
 
-
-    private boolean isLeaf = true;
 
     public Node(String question, Node yesBranch, Node noBranch) {
         this.question=question;
