@@ -56,11 +56,11 @@ public class Node {
     @Override
     public String toString() {
         return "Node{" +
-                "question='" + question + '\'' +
-                ", animal='" + animal + '\'' +
-                ", yesBranch=" + yesBranch +
-                ", noBranch=" + noBranch +
-                ", isLeaf=" + isLeaf +
+                (!"".equals(question)&&question!=null? "question='" + question + '\'':"") + " "+
+                (!"".equals(animal)&&animal!=null? "animal='" + animal + '\'':"") + " "+
+                (yesBranch!=null? ", yesBranch=" + yesBranch :"")+ " "+
+                (noBranch!=null? ", noBranch=" + noBranch :"")+ " "+
+//                ", isLeaf=" + isLeaf +
                 '}';
     }
 
