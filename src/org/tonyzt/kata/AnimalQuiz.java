@@ -70,9 +70,10 @@ public class AnimalQuiz {
                 return toReturn;
             }
         };
-//        sc.getAnimalKnowledgeManager().setKnowledgeTree(new Node("elephant"));
-//        sc.getAnimalKnowledgeManager().getKnowledgeTree().setLeaf(true);
-
+        sc = new StateContext();
+ //       System.out.println("sc"+sc);
+        //sc.getAnimalKnowledgeManager().setKnowledgeTree(new Node("elephant"));
+        //sc.getAnimalKnowledgeManager().getKnowledgeTree().setLeaf(true);
 
         knowelegeTree= new Node("elephant");
         knowelegeTree.setLeaf(true);
@@ -93,7 +94,6 @@ public class AnimalQuiz {
     public void addKnowledge(List<String> yesNoList, String question, String answer, String animal) {
         Node node = knowelegeTree.arrangeByPath(yesNoList,animal,question,answer);
         knowelegeTree=node;
-
     }
 
     public void start() {
