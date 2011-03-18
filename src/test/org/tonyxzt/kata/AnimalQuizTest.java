@@ -1,13 +1,9 @@
 package test.org.tonyxzt.kata;
 
-import com.sun.org.apache.bcel.internal.generic.NEW;
-import com.sun.org.apache.xml.internal.dtm.ref.DTMDefaultBaseIterators;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Matchers;
-import org.mockito.internal.stubbing.ConsecutiveStubbing;
+import org.mockito.stubbing.OngoingStubbing;
 import org.tonyzt.kata.AnimalQuiz;
 import org.tonyzt.kata.InStream;
 import org.tonyzt.kata.Node;
@@ -69,11 +65,7 @@ public class AnimalQuizTest {
         when(inputData.getInput()).thenReturn("No").thenReturn("mouse").thenReturn("Is it big?").thenReturn("No");
 
         animalQuiz.start();
-        animalQuiz.step();
-        animalQuiz.step();
-        animalQuiz.step();
-        animalQuiz.step();
-        animalQuiz.step();
+        stepNTimes(animalQuiz, 5);
 
         verify(writer).output("think of an animal");
         verify(writer).output("Is it a elephant?"); //no
@@ -93,11 +85,7 @@ public class AnimalQuizTest {
         when(inputData.getInput()).thenReturn("No").thenReturn("No").thenReturn("worm").thenReturn("Does it have 1000 legs?").thenReturn("Yes");
 
         animalQuiz.start();
-        animalQuiz.step();
-        animalQuiz.step();
-        animalQuiz.step();
-        animalQuiz.step();
-        animalQuiz.step();
+        stepNTimes(animalQuiz,5);
 
         verify(writer).output("think of an animal");
         verify(writer).output("Is it big?");
@@ -120,12 +108,7 @@ public class AnimalQuizTest {
 
         when(inputData.getInput()).thenReturn("No").thenReturn("No").thenReturn("worm").thenReturn("Does it have 1000 legs?").thenReturn("Yes");
         animalQuiz.start();
-        animalQuiz.step();
-        animalQuiz.step();
-        animalQuiz.step();
-        animalQuiz.step();
-        animalQuiz.step();
-        animalQuiz.step();
+        stepNTimes(animalQuiz,6);
 
         verify(writer).output("think of an animal");
         verify(writer,times(2)).output("Is it big?");
@@ -136,11 +119,7 @@ public class AnimalQuizTest {
 
         when(inputData.getInput()).thenReturn("No").thenReturn("Yes").thenReturn("No").thenReturn("microb").thenReturn("Is it microscopic?").thenReturn("Yes");
 
-        animalQuiz.step();
-        animalQuiz.step();
-        animalQuiz.step();
-        animalQuiz.step();
-        animalQuiz.step();
+        stepNTimes(animalQuiz,5);
 
         verify(writer).output("think of an animal");
         verify(writer).output("Does it have 1000 legs?");
@@ -214,6 +193,13 @@ public class AnimalQuizTest {
         Node root2 = new Node("Is it big?",new Node("elefant"),new Node("Does it have 1000 legs?",new Node("worm"),new Node("mouse")));
         Assert.assertEquals(root,root2);
     }
+
+    private void stepNTimes(AnimalQuiz animalQuiz, int n) {
+        for (int i=0;i<n;i++) {
+            animalQuiz.step();
+        }
+    }
+
 
 }
 
