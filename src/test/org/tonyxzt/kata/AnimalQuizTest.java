@@ -3,6 +3,7 @@ package test.org.tonyxzt.kata;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.stubbing.OngoingStubbing;
 import org.tonyzt.kata.AnimalQuiz;
 import org.tonyzt.kata.InStream;
@@ -34,10 +35,11 @@ public class AnimalQuizTest {
     @Test
     public void when_starting_state_is_elefant_then_first_question_is_if_it_is_elefant() {
         AnimalQuiz animalQuiz = new AnimalQuiz(inputData, writer, "elephant");
+        InOrder inOrder = inOrder(writer);
         animalQuiz.start();
         animalQuiz.step();
-        verify(writer).output("think of an animal");
-        verify(writer).output("Is it a elephant?");
+        inOrder.verify(writer).output("think of an animal");
+        inOrder.verify(writer).output("Is it a elephant?");
     }
 
 
@@ -46,14 +48,15 @@ public class AnimalQuizTest {
         Node root = new Node("Is it big?",new Node("elephant"),new Node("mouse"));
         when(inputData.getInput()).thenReturn("No");
         AnimalQuiz animalQuiz = new AnimalQuiz(inputData,writer,root);
+        InOrder inOrder = inOrder(writer);
 
         animalQuiz.start();
         animalQuiz.step();
         animalQuiz.step();
 
-        verify(writer).output("think of an animal");
-        verify(writer).output("Is it big?");
-        verify(writer).output("Is it a mouse?");
+        inOrder.verify(writer).output("think of an animal");
+        inOrder.verify(writer).output("Is it big?");
+        inOrder.verify(writer).output("Is it a mouse?");
     }
 
     @Test
@@ -63,15 +66,16 @@ public class AnimalQuizTest {
 
         AnimalQuiz animalQuiz = new AnimalQuiz(inputData,writer,root);
         when(inputData.getInput()).thenReturn("No").thenReturn("mouse").thenReturn("Is it big?").thenReturn("No");
+        InOrder inOrder = inOrder(writer);
 
         animalQuiz.start();
         stepNTimes(animalQuiz, 5);
 
-        verify(writer).output("think of an animal");
-        verify(writer).output("Is it a elephant?"); //no
-        verify(writer).output("What animal was?"); //mouse
-        verify(writer).output("What question would you suggest to distinguish a elephant from a mouse?"); // is it big?
-        verify(writer).output("What should be the answer to the question \"Is it big?\" to indicate a mouse compared to a elephant?"); //No
+        inOrder.verify(writer).output("think of an animal");
+        inOrder.verify(writer).output("Is it a elephant?"); //no
+        inOrder.verify(writer).output("What animal was?"); //mouse
+        inOrder.verify(writer).output("What question would you suggest to distinguish a elephant from a mouse?"); // is it big?
+        inOrder.verify(writer).output("What should be the answer to the question \"Is it big?\" to indicate a mouse compared to a elephant?"); //No
 
         Assert.assertEquals(expectedAfterLearning, animalQuiz.getNode());
     }
@@ -83,18 +87,17 @@ public class AnimalQuizTest {
 
         AnimalQuiz animalQuiz = new AnimalQuiz(inputData,writer,startNode);
         when(inputData.getInput()).thenReturn("No").thenReturn("No").thenReturn("worm").thenReturn("Does it have 1000 legs?").thenReturn("Yes");
+        InOrder inOrder = inOrder(writer);
 
         animalQuiz.start();
         stepNTimes(animalQuiz,5);
 
-        verify(writer).output("think of an animal");
-        verify(writer).output("Is it big?");
-        verify(writer).output("Is it a mouse?");
-        verify(writer).output("What animal was?");
-        verify(writer).output("What question would you suggest to distinguish a mouse from a worm?");
-        verify(writer).output("What should be the answer to the question \"Does it have 1000 legs?\" to indicate a worm compared to a mouse?");
-
-        animalQuiz.step();
+        inOrder.verify(writer).output("think of an animal");
+        inOrder.verify(writer).output("Is it big?");
+        inOrder.verify(writer).output("Is it a mouse?");
+        inOrder.verify(writer).output("What animal was?");
+        inOrder.verify(writer).output("What question would you suggest to distinguish a mouse from a worm?");
+        inOrder.verify(writer).output("What should be the answer to the question \"Does it have 1000 legs?\" to indicate a worm compared to a mouse?");
 
         Assert.assertEquals(expected, animalQuiz.getNode());
     }
@@ -109,23 +112,24 @@ public class AnimalQuizTest {
         when(inputData.getInput()).thenReturn("No").thenReturn("No").thenReturn("worm").thenReturn("Does it have 1000 legs?").thenReturn("Yes");
         animalQuiz.start();
         stepNTimes(animalQuiz,6);
+        InOrder inOrder = inOrder(writer);
 
-        verify(writer).output("think of an animal");
-        verify(writer,times(2)).output("Is it big?");
-        verify(writer).output("What animal was?");
-        verify(writer).output("What question would you suggest to distinguish a mouse from a worm?");
-        verify(writer).output("What should be the answer to the question \"Does it have 1000 legs?\" to indicate a worm compared to a mouse?");
+        inOrder.verify(writer).output("think of an animal");
+        inOrder.verify(writer).output("Is it big?");
+        inOrder.verify(writer).output("What animal was?");
+        inOrder.verify(writer).output("What question would you suggest to distinguish a mouse from a worm?");
+        inOrder.verify(writer).output("What should be the answer to the question \"Does it have 1000 legs?\" to indicate a worm compared to a mouse?");
         Assert.assertEquals(expected, animalQuiz.getNode());
 
         when(inputData.getInput()).thenReturn("No").thenReturn("Yes").thenReturn("No").thenReturn("microb").thenReturn("Is it microscopic?").thenReturn("Yes");
 
         stepNTimes(animalQuiz,5);
 
-        verify(writer).output("think of an animal");
-        verify(writer).output("Does it have 1000 legs?");
-        verify(writer).output("Is it a worm?");
-        verify(writer,times(2)).output("What animal was?");
-        verify(writer).output("What question would you suggest to distinguish a worm from a microb?");
+        inOrder.verify(writer).output("Is it big?");
+        inOrder.verify(writer).output("Does it have 1000 legs?");
+        inOrder.verify(writer).output("Is it a worm?");
+        inOrder.verify(writer).output("What animal was?");
+        inOrder.verify(writer).output("What question would you suggest to distinguish a worm from a microb?");
         verify(writer).output("What should be the answer to the question \"Is it microscopic?\" to indicate a microb compared to a worm?");
     }
 
