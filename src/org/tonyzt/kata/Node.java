@@ -12,18 +12,9 @@ import java.util.List;
  * Time: 2.17
  * To change this template use File | Settings | File Templates.
  */
-public class Node {
+public class Node implements NodeI {
     private String question;
-    public void setQuestion(String question) {
-        this.question = question;
-    }
-
-
     private String animal;
-    public void setAnimal(String animal) {
-        this.animal = animal;
-    }
-
 
     private Node yesBranch;
     public void setYesBranch(Node yesBranch) {
@@ -35,12 +26,10 @@ public class Node {
         this.noBranch = noBranch;
     }
 
-
     private boolean isLeaf = true;
     public void setLeaf(boolean leaf) {
         isLeaf = leaf;
     }
-
 
     public Node(String question, Node yesBranch, Node noBranch) {
         this.question=question;
@@ -60,7 +49,6 @@ public class Node {
                 (!"".equals(animal)&&animal!=null? "animal='" + animal + '\'':"") + " "+
                 (yesBranch!=null? ", yesBranch=" + yesBranch :"")+ " "+
                 (noBranch!=null? ", noBranch=" + noBranch :"")+ " "+
-//                ", isLeaf=" + isLeaf +
                 '}';
     }
 
@@ -68,6 +56,7 @@ public class Node {
         isLeaf=true;
         this.animal=animal;
     }
+
     public boolean isLeaf() {
         return isLeaf;
     }
@@ -124,8 +113,8 @@ public class Node {
         List<String> tail = (strings.size()>=1?strings.subList(1,strings.size()):new ArrayList<String>());
         String head = (strings.size()>0?strings.get(0):"");
 
-        return (head.equalsIgnoreCase("Yes")? new Node(this.question,this.getYesBranch().arrangeByPath(tail,newAnimal,question,yesNoAnswer),this.getNoBranch()):
-                new Node(this.question,this.getYesBranch(),this.getNoBranch().arrangeByPath(tail,newAnimal,question,yesNoAnswer)));
+        return (head.equalsIgnoreCase("Yes")? new Node(this.getQuestion(),this.getYesBranch().arrangeByPath(tail,newAnimal,question,yesNoAnswer),this.getNoBranch()):
+                new Node(this.getQuestion(),this.getYesBranch(),this.getNoBranch().arrangeByPath(tail,newAnimal,question,yesNoAnswer)));
     }
 }
 

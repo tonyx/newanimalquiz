@@ -1,14 +1,13 @@
 package test.org.tonyxzt.kata;
 
+import com.sun.org.apache.xml.internal.security.keys.storage.StorageResolver;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.stubbing.OngoingStubbing;
-import org.tonyzt.kata.AnimalQuiz;
-import org.tonyzt.kata.InStream;
-import org.tonyzt.kata.Node;
-import org.tonyzt.kata.OutStream;
+import org.tonyzt.kata.*;
+import org.tonyzt.kata.persistency.AnimalQuizStorage;
 
 import java.util.*;
 
@@ -135,6 +134,19 @@ public class AnimalQuizTest {
 
 
     @Test
+    public void testPersistence()
+    {
+        NodeI node = new Node("Is it big?",new Node("elephant"),new Node("Does it have 1000 legs?",new Node("worm"),new Node("mouse")));
+        AnimalQuizStorage animalQuizStorage = new AnimalQuizStorage();
+
+        animalQuizStorage.persist(node,"name");
+
+        NodeI retrieved = animalQuizStorage.load("name");
+        Assert.assertEquals(node,retrieved);
+    }
+
+
+    @Test
     public void testOneLevelLearningOnDomainModel() {
         Node root = new Node("elephant");
         Node expectedAfterLearning = new Node("Is it big?",new Node("elephant"),new Node("mouse"));
@@ -197,6 +209,9 @@ public class AnimalQuizTest {
         Node root2 = new Node("Is it big?",new Node("elefant"),new Node("Does it have 1000 legs?",new Node("worm"),new Node("mouse")));
         Assert.assertEquals(root,root2);
     }
+
+
+
 
     private void stepNTimes(AnimalQuiz animalQuiz, int n) {
         for (int i=0;i<n;i++) {

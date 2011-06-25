@@ -34,6 +34,7 @@ public class AnimalQuiz {
     public void setThoughtAnimal(String thoughtAnimal) {
         this.thoughtAnimal = thoughtAnimal;
     }
+
     public String getThoughtAnimal() {
         return thoughtAnimal;
     }
@@ -71,9 +72,6 @@ public class AnimalQuiz {
             }
         };
         sc = new StateContext();
- //       System.out.println("sc"+sc);
-        //sc.getAnimalKnowledgeManager().setKnowledgeTree(new Node("elephant"));
-        //sc.getAnimalKnowledgeManager().getKnowledgeTree().setLeaf(true);
 
         knowelegeTree= new Node("elephant");
         knowelegeTree.setLeaf(true);

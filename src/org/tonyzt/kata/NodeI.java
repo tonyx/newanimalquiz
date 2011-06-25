@@ -7,10 +7,10 @@ package org.tonyzt.kata;
  * Time: 12.29
  * To change this template use File | Settings | File Templates.
  */
-public interface NodeI {
+public interface NodeI  {
     public boolean isLeaf();
     public String getQuestion();
-    public NodeI getYesNode();
-    public NodeI getLeftNode();
+    public NodeI getYesBranch();
+    public NodeI getNoBranch();
 
 }
