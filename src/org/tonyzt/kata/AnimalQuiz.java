@@ -1,7 +1,6 @@
 package org.tonyzt.kata;
 import org.tonyzt.kata.states.StateContext;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -16,17 +15,17 @@ public class AnimalQuiz {
     OutStream _writer;
     InStream _inputData;
     StateContext sc;
-    Node knowelegeTree;
+    NodeI knowledgeTree;
 
-    public Node getKnowelegeTree() {
-        return knowelegeTree;
+    public NodeI getKnowledgeTree() {
+        return knowledgeTree;
     }
 
-    Node currentNode;
-    public Node getCurrentNode() {
+    NodeI currentNode;
+    public NodeI getCurrentNode() {
         return currentNode;
     }
-    public void setCurrentNode(Node currentNode) {
+    public void setCurrentNode(NodeI currentNode) {
         this.currentNode = currentNode;
     }
 
@@ -39,20 +38,14 @@ public class AnimalQuiz {
         return thoughtAnimal;
     }
 
-    public AnimalQuiz(InStream inputData, OutStream writer,String animal) {
+    public AnimalQuiz(InStream inputData, OutStream writer,NodeI node) {
         _inputData=inputData;
-        knowelegeTree = new Node(animal);
+        knowledgeTree = node;
         _writer = writer;
     }
 
-    public AnimalQuiz(InStream inputData, OutStream writer,Node node) {
-        _inputData=inputData;
-        knowelegeTree = node;
-        _writer = writer;
-    }
-
-    public Node getNode() {
-        return knowelegeTree;
+    public NodeI getNode() {
+        return knowledgeTree;
     }
 
     @Deprecated
@@ -72,9 +65,7 @@ public class AnimalQuiz {
             }
         };
         sc = new StateContext();
-
-        knowelegeTree= new Node("elephant");
-        knowelegeTree.setLeaf(true);
+        knowledgeTree = new LeafNode("elephant");
     }
 
     public static void main(String[] string) {
@@ -90,8 +81,8 @@ public class AnimalQuiz {
     }
 
     public void addKnowledge(List<String> yesNoList, String question, String answer, String animal) {
-        Node node = knowelegeTree.arrangeByPath(yesNoList,animal,question,answer);
-        knowelegeTree=node;
+        NodeI node = knowledgeTree.arrangeByPath(yesNoList,animal,question,answer);
+        knowledgeTree =node;
     }
 
     public void start() {

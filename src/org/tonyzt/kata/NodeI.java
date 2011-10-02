@@ -1,5 +1,8 @@
 package org.tonyzt.kata;
 
+import org.tonyzt.kata.states.StateContext;
+
+import java.util.List;
 /**
  * Created by IntelliJ IDEA.
  * User: Tonino
@@ -8,9 +11,8 @@ package org.tonyzt.kata;
  * To change this template use File | Settings | File Templates.
  */
 public interface NodeI  {
-    public boolean isLeaf();
-    public String getQuestion();
-    public NodeI getYesBranch();
-    public NodeI getNoBranch();
-
+    public void conversate(StateContext stateContext, OutStream outStream);
+    public NodeI getSubBranch(String yesNot);
+    public NodeI arrangeByPath(List<String> yesNoList, String question, String answer, String animal);
+    public String getAnimal();
 }

@@ -11,25 +11,25 @@ import java.util.List;
  */
 public class AnimalKnowledgeManager {
 
-    Node currentNode;
-    public Node getCurrentNode() {
+    NodeI currentNode;
+    public NodeI getCurrentNode() {
         return currentNode;
     }
-    public void setCurrentNode(Node currentNode) {
+    public void setCurrentNode(NodeI currentNode) {
         this.currentNode = currentNode;
     }
 
-    Node knowledgeTree;
-    public Node getKnowledgeTree() {
+    NodeI knowledgeTree;
+    public NodeI getKnowledgeTree() {
         return knowledgeTree;
     }
 
-    public void setKnowledgeTree(Node knowledgeTree) {
+    public void setKnowledgeTree(NodeI knowledgeTree) {
         this.knowledgeTree = knowledgeTree;
     }
 
     public void addKnowledge(List<String> yesNoList, String question, String answer, String animal) {
-        Node nod = getKnowledgeTree().arrangeByPath(yesNoList, animal, question, answer);
+        NodeI nod = getKnowledgeTree().arrangeByPath(yesNoList, animal, question, answer);
         knowledgeTree =nod;
     }
 }

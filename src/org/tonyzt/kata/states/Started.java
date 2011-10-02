@@ -15,16 +15,17 @@ public class Started implements State {
     public void step(StateContext sc, AnimalQuiz animalQuiz,InStream instream, OutStream outStream) {
 
         sc.resetYesNoList();
-        animalQuiz.setCurrentNode(animalQuiz.getKnowelegeTree());
+        animalQuiz.setCurrentNode(animalQuiz.getKnowledgeTree());
 
-        if (animalQuiz.getKnowelegeTree().isLeaf()) {
-            String animal = animalQuiz.getKnowelegeTree().getAnimal();
-            outStream.output("Is it a "+animal+"?");
-            sc.setState(new GuessMade());
-        } else {
-            sc.setState(new Guessing());
-            outStream.output(animalQuiz.getKnowelegeTree().getQuestion());
-        }
+        animalQuiz.getKnowledgeTree().conversate(sc, outStream);
+//        if (animalQuiz.getKnowledgeTree().isLeaf()) {
+//            String animal = animalQuiz.getKnowledgeTree().getAnimal();
+//            outStream.output("Is it a "+animal+"?");
+//            sc.setState(new GuessMade());
+//        } else {
+//            sc.setState(new Guessing());
+//            outStream.output(animalQuiz.getKnowledgeTree().getQuestion());
+//        }
 
     }
 }

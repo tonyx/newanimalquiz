@@ -1,6 +1,9 @@
 package org.tonyzt.kata;
 
 import com.sun.xml.internal.fastinfoset.util.StringArray;
+import org.tonyzt.kata.states.GuessMade;
+import org.tonyzt.kata.states.Guessing;
+import org.tonyzt.kata.states.StateContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +60,18 @@ public class Node implements NodeI {
         this.animal=animal;
     }
 
+    @Override
+    public void conversate(StateContext sc, OutStream outStream) {
+        if (isLeaf()) {
+            String animal = getAnimal();
+            outStream.output("Is it a "+animal+"?");
+            sc.setState(new GuessMade());
+        } else {
+            sc.setState(new Guessing());
+            outStream.output(getQuestion());
+        }
+    }
+
     public boolean isLeaf() {
         return isLeaf;
     }
@@ -75,6 +90,11 @@ public class Node implements NodeI {
 
     public Node getNoBranch() {
         return noBranch;
+    }
+
+    @Override
+    public NodeI getSubBranch(String yesNot) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
