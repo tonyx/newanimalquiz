@@ -1,6 +1,5 @@
 package org.tonyzt.kata.persistency;
 
-import org.tonyzt.kata.Node;
 import org.tonyzt.kata.NodeI;
 
 /**

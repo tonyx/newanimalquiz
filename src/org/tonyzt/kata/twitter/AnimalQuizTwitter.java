@@ -2,7 +2,7 @@ package org.tonyzt.kata.twitter;
 
 import org.tonyzt.kata.AnimalQuiz;
 import org.tonyzt.kata.InStream;
-import org.tonyzt.kata.Node;
+import org.tonyzt.kata.LeafNode;
 import org.tonyzt.kata.OutStream;
 import org.tonyzt.kata.conversationStream.InStreamImpl;
 import org.tonyzt.kata.conversationStream.OutStreamImpl;
@@ -22,7 +22,7 @@ public class AnimalQuizTwitter {
         twitter.verifyCredentials();
         InStream twitterINStream = new InStreamImpl(twitter,"animalquiz2");
         OutStream twitterOutStream = new OutStreamImpl(twitter,"animalquiz2");
-        AnimalQuiz twitterAnimalQuiz = new AnimalQuiz(twitterINStream,twitterOutStream,new Node("elephant"));
+        AnimalQuiz twitterAnimalQuiz = new AnimalQuiz(twitterINStream,twitterOutStream,new LeafNode("elephant"));
             new AnimalQuizTwitter().removeAllMessagesMentioningMeThatICanRemove(twitter);
         twitterAnimalQuiz.start();
         while(true) {
