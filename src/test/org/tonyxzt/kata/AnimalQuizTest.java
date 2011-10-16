@@ -63,6 +63,27 @@ public class AnimalQuizTest {
         inOrder.verify(writer).output("Is it a mouse?");
     }
 
+      @Test
+    public void can_distinguish_between_elephant_and_mouseItalian() {
+        // given
+        writer = mock(OutStream.class);
+        reader = mock(InStream.class);
+        NodeI root = new NonLeafNode("E' grande?",new LeafNode("elefante"),new LeafNode("topo"));
+        when(reader.getInput()).thenReturn("No");
+        AnimalQuiz animalQuiz = new AnimalQuiz(new SpeakerImplIt(),reader,writer,root,new StateContext());
+        InOrder inOrder = inOrder(writer);
+
+        // when
+        animalQuiz.start();
+        animalQuiz.step();
+        animalQuiz.step();
+
+        // then
+        inOrder.verify(writer).output("Pensa ad un animale");
+        inOrder.verify(writer).output("E' grande?");
+        inOrder.verify(writer).output("E' un topo?");
+    }
+
 
     @Test
     public void unallowedWordsInConversation() {
