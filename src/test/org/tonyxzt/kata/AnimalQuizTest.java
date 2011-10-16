@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.tonyzt.kata.*;
 import org.tonyzt.kata.persistency.AnimalQuizStorage;
+import org.tonyzt.kata.states.StateContext;
 
 import java.util.*;
 
@@ -20,15 +21,16 @@ import static org.mockito.Mockito.*;
  */
 public class AnimalQuizTest {
     OutStream writer;
-    InStream inputData;
+    InStream reader;
 
 
     @Test
     public void when_starting_state_is_elephant_then_first_question_is_if_it_is_elephant() {
         // given
         writer = mock(OutStream.class);
-        inputData = mock(InStream.class);
-        AnimalQuiz animalQuiz = new AnimalQuiz(inputData, writer, new LeafNode("elephant"));
+        reader = mock(InStream.class);
+        //AnimalQuiz animalQuiz = new AnimalQuiz(reader, writer, new LeafNode("elephant"));
+        AnimalQuiz animalQuiz = new AnimalQuiz(new SpeakerImpl(),reader,writer,new LeafNode("elephant"),new StateContext());
         InOrder inOrder = inOrder(writer);
 
         // when
@@ -44,11 +46,10 @@ public class AnimalQuizTest {
     public void can_distinguish_between_elephant_and_mouseXXxxx() {
         // given
         writer = mock(OutStream.class);
-        inputData = mock(InStream.class);
-        //Node root = new Node("Is it big?",new Node("elephant"),new Node("mouse"));
+        reader = mock(InStream.class);
         NodeI root = new NonLeafNode("Is it big?",new LeafNode("elephant"),new LeafNode("mouse"));
-        when(inputData.getInput()).thenReturn("No");
-        AnimalQuiz animalQuiz = new AnimalQuiz(inputData,writer,root);
+        when(reader.getInput()).thenReturn("No");
+        AnimalQuiz animalQuiz = new AnimalQuiz(new SpeakerImpl(),reader,writer,root,new StateContext());
         InOrder inOrder = inOrder(writer);
 
         // when
@@ -63,6 +64,30 @@ public class AnimalQuizTest {
     }
 
 
+    @Test
+    public void unallowedWordsInConversation() {
+
+        // given
+        writer = mock(OutStream.class);
+        reader = mock(InStream.class);
+        NodeI root = new NonLeafNode("Is it big?",new LeafNode("elephant"),new LeafNode("mouse"));
+        when(reader.getInput()).thenReturn("burp").thenReturn("no").thenReturn("yes");
+        //AnimalQuiz animalQuiz = new AnimalQuiz(reader,writer,root);
+        AnimalQuiz animalQuiz = new AnimalQuiz(new SpeakerImpl(),reader,writer,root,new StateContext());
+        InOrder inOrder = inOrder(writer);
+
+        // when
+        animalQuiz.start();
+        animalQuiz.step();
+        animalQuiz.step();
+        animalQuiz.step();
+
+        // then
+        inOrder.verify(writer).output("think of an animal");
+        inOrder.verify(writer).output("Is it big?");
+        inOrder.verify(writer).output("yes or not");
+        inOrder.verify(writer).output("Is it a mouse?");
+    }
 
 
     @Test
@@ -70,10 +95,11 @@ public class AnimalQuizTest {
 
         // given
         writer = mock(OutStream.class);
-        inputData = mock(InStream.class);
+        reader = mock(InStream.class);
         NodeI root = new NonLeafNode("Is it big?",new LeafNode("elephant"),new LeafNode("mouse"));
-        when(inputData.getInput()).thenReturn("No");
-        AnimalQuiz animalQuiz = new AnimalQuiz(inputData,writer,root);
+        when(reader.getInput()).thenReturn("No");
+        //AnimalQuiz animalQuiz = new AnimalQuiz(reader,writer,root);
+        AnimalQuiz animalQuiz = new AnimalQuiz(new SpeakerImpl(),reader,writer,root,new StateContext());
         InOrder inOrder = inOrder(writer);
 
         // when
@@ -91,11 +117,12 @@ public class AnimalQuizTest {
     public void testOneLevelLearning() {
         // given
         writer = mock(OutStream.class);
-        inputData = mock(InStream.class);
+        reader = mock(InStream.class);
         NodeI root = new LeafNode("elephant");
         NodeI expectedAfterLearning = new NonLeafNode("Is it big?",new LeafNode("elephant"),new LeafNode("mouse"));
-        AnimalQuiz animalQuiz = new AnimalQuiz(inputData,writer,root);
-        when(inputData.getInput()).thenReturn("No").thenReturn("mouse").thenReturn("Is it big?").thenReturn("No");
+        //AnimalQuiz animalQuiz = new AnimalQuiz(reader,writer,root);
+        AnimalQuiz animalQuiz = new AnimalQuiz(new SpeakerImpl(),reader,writer,root,new StateContext());
+        when(reader.getInput()).thenReturn("No").thenReturn("mouse").thenReturn("Is it big?").thenReturn("No");
         InOrder inOrder = inOrder(writer);
 
         // when
@@ -116,11 +143,12 @@ public class AnimalQuizTest {
     public void testTwoLevelLearning() {
         // given
         writer = mock(OutStream.class);
-        inputData = mock(InStream.class);
+        reader = mock(InStream.class);
         NodeI startNode = new NonLeafNode("Is it big?",new LeafNode("elephant"),new LeafNode("mouse"));
         NodeI expected = new NonLeafNode("Is it big?",new LeafNode("elephant"),new NonLeafNode("Does it have 1000 legs?",new LeafNode("worm"),new LeafNode("mouse")));
-        AnimalQuiz animalQuiz = new AnimalQuiz(inputData,writer,startNode);
-        when(inputData.getInput()).thenReturn("No").thenReturn("No").thenReturn("worm").thenReturn("Does it have 1000 legs?").thenReturn("Yes");
+        //AnimalQuiz animalQuiz = new AnimalQuiz(reader,writer,startNode);
+        AnimalQuiz animalQuiz = new AnimalQuiz(new SpeakerImpl(),reader,writer,startNode,new StateContext());
+        when(reader.getInput()).thenReturn("No").thenReturn("No").thenReturn("worm").thenReturn("Does it have 1000 legs?").thenReturn("Yes");
         InOrder inOrder = inOrder(writer);
 
         // when
@@ -135,7 +163,7 @@ public class AnimalQuizTest {
         inOrder.verify(writer).output("What question would you suggest to distinguish a mouse from a worm?");
         inOrder.verify(writer).output("What should be the answer to the question \"Does it have 1000 legs?\" to indicate a worm compared to a mouse?");
 
-        //Assert.assertEquals(expected, animalQuiz.getNode());
+        Assert.assertEquals(expected, animalQuiz.getNode());
     }
 
 
@@ -143,13 +171,13 @@ public class AnimalQuizTest {
     public void testThreeLevelLearning() {
         // given
         writer = mock(OutStream.class);
-        inputData = mock(InStream.class);
+        reader = mock(InStream.class);
         NodeI startNode = new NonLeafNode("Is it big?",new LeafNode("elephant"),new LeafNode("mouse"));
         NodeI expected = new NonLeafNode("Is it big?",new LeafNode("elephant"),new NonLeafNode("Does it have 1000 legs?",new LeafNode("worm"),new LeafNode("mouse")));
 
-
-        AnimalQuiz animalQuiz = new AnimalQuiz(inputData,writer,startNode);
-        when(inputData.getInput()).thenReturn("No").thenReturn("No").thenReturn("worm").thenReturn("Does it have 1000 legs?").thenReturn("Yes");
+        //AnimalQuiz animalQuiz = new AnimalQuiz(reader,writer,startNode);
+        AnimalQuiz animalQuiz = new AnimalQuiz(new SpeakerImpl(),reader,writer,startNode,new StateContext());
+        when(reader.getInput()).thenReturn("No").thenReturn("No").thenReturn("worm").thenReturn("Does it have 1000 legs?").thenReturn("Yes");
 
         // when
         animalQuiz.start();
@@ -165,7 +193,7 @@ public class AnimalQuizTest {
         Assert.assertEquals(expected, animalQuiz.getNode());
 
         // given
-        when(inputData.getInput()).thenReturn("No").thenReturn("Yes").thenReturn("No").thenReturn("microb").thenReturn("Is it microscopic?").thenReturn("Yes");
+        when(reader.getInput()).thenReturn("No").thenReturn("Yes").thenReturn("No").thenReturn("microb").thenReturn("Is it microscopic?").thenReturn("Yes");
 
         // when
         stepNTimes(animalQuiz,5);
@@ -185,7 +213,7 @@ public class AnimalQuizTest {
     public void testPersistence()
     {
         writer = mock(OutStream.class);
-        inputData = mock(InStream.class);
+        reader = mock(InStream.class);
         NodeI node = new NonLeafNode("Is it big?",new LeafNode("elephant"),new NonLeafNode("Does it have 1000 legs?",new LeafNode("worm"),new LeafNode("mouse")));
         AnimalQuizStorage animalQuizStorage = new AnimalQuizStorage();
 
@@ -200,14 +228,14 @@ public class AnimalQuizTest {
     public void testOneLevelLearningOnDomainModel() {
         // given
         writer = mock(OutStream.class);
-        inputData = mock(InStream.class);
+        reader = mock(InStream.class);
         NodeI root = new LeafNode("elephant");
         NodeI expectedAfterLearning = new NonLeafNode("Is it big?",new LeafNode("elephant"),new LeafNode("mouse"));
         List<String> aList = new ArrayList<String>();
         aList.add("No");
 
         // when
-        NodeI nodeResulted = root.arrangeByPath(new ArrayList<String>(),"mouse","Is it big?","No");
+        NodeI nodeResulted = root.arrangeKnowledge(new ArrayList<String>(), "mouse", "Is it big?", "No");
 
         // then
         Assert.assertEquals(expectedAfterLearning,nodeResulted);
@@ -217,7 +245,7 @@ public class AnimalQuizTest {
     public void testEquality() {
         // given
         writer = mock(OutStream.class);
-        inputData = mock(InStream.class);
+        reader = mock(InStream.class);
 
         //NodeI root = new LeafNode("elephant");
         NodeI expectedAfterLearning = new NonLeafNode("Is it big?",new LeafNode("elephant"),new LeafNode("mouse"));
@@ -235,14 +263,14 @@ public class AnimalQuizTest {
     public void testOneLevelLearningOnTree2() {
         // given
         writer = mock(OutStream.class);
-        inputData = mock(InStream.class);
+        reader = mock(InStream.class);
         NodeI root = new LeafNode("elephant");
         NodeI expectedAfterLearning = new NonLeafNode("Is it small?",new LeafNode("mouse"),new LeafNode("elephant"));
         List<String> aList = new ArrayList<String>();
         aList.add("No");
 
         // when
-        NodeI nodeResulted = root.arrangeByPath(new ArrayList<String>(),"mouse","Is it small?","Yes");
+        NodeI nodeResulted = root.arrangeKnowledge(new ArrayList<String>(), "mouse", "Is it small?", "Yes");
 
         // then
         Assert.assertEquals(expectedAfterLearning,nodeResulted);
@@ -253,7 +281,7 @@ public class AnimalQuizTest {
     public void testTwoLevelLearningOnTree() {
         // given
         writer = mock(OutStream.class);
-        inputData = mock(InStream.class);
+        reader = mock(InStream.class);
         NodeI node = new NonLeafNode("Is it small?",new LeafNode("mouse"),new LeafNode("elephant"));
         NodeI expectedAfterLearning = new NonLeafNode("Is it small?",new NonLeafNode("Does it have 1000 legs?",new LeafNode("worm"),new LeafNode("mouse")),
                 new LeafNode("elephant"));
@@ -262,7 +290,7 @@ public class AnimalQuizTest {
         aList.add("Yes");
 
         // when
-        NodeI nodeResulted = node.arrangeByPath(aList,"worm","Does it have 1000 legs?","Yes");
+        NodeI nodeResulted = node.arrangeKnowledge(aList, "worm", "Does it have 1000 legs?", "Yes");
 
         // then
         Assert.assertEquals(expectedAfterLearning,nodeResulted);
@@ -273,7 +301,7 @@ public class AnimalQuizTest {
     public void testThreeLevelLearningOnTree() {
         // given
         writer = mock(OutStream.class);
-        inputData = mock(InStream.class);
+        reader = mock(InStream.class);
         NodeI node = new NonLeafNode("Is it small?",new NonLeafNode("Does it have 1000 legs?",new LeafNode("worm"),new LeafNode("mouse")),
                 new LeafNode("elephant"));
         NodeI expectedAfterLearning = new NonLeafNode("Is it small?",new NonLeafNode("Does it have 1000 legs?",new NonLeafNode("Is it microscopic?",new LeafNode("microb"),new LeafNode("worm")),new LeafNode("mouse")),
@@ -282,7 +310,7 @@ public class AnimalQuizTest {
         aList.add("Yes");
         aList.add("Yes");
         // when
-        NodeI nodeResulted = node.arrangeByPath(aList, "microb", "Is it microscopic?", "Yes");
+        NodeI nodeResulted = node.arrangeKnowledge(aList, "microb", "Is it microscopic?", "Yes");
 
         // then
         Assert.assertEquals(expectedAfterLearning,nodeResulted);
@@ -303,7 +331,6 @@ public class AnimalQuizTest {
             animalQuiz.step();
         }
     }
-
 
 }
 

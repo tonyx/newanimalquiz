@@ -1,6 +1,5 @@
 package org.tonyzt.kata.states;
 
-import org.tonyzt.kata.AnimalKnowledgeManager;
 import org.tonyzt.kata.AnimalQuiz;
 import org.tonyzt.kata.InStream;
 import org.tonyzt.kata.OutStream;
@@ -16,14 +15,6 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class StateContext {
-    AnimalKnowledgeManager animalKnowledgeManager;
-    public AnimalKnowledgeManager getAnimalKnowledgeManager() {
-        return animalKnowledgeManager;
-    }
-
-    public void setAnimalKnowledgeManager(AnimalKnowledgeManager animalKnowledgeManager) {
-        this.animalKnowledgeManager = animalKnowledgeManager;
-    }
 
     List<String> yesNoList;
     public List<String> getYesNoList() {
@@ -32,10 +23,6 @@ public class StateContext {
 
     public void resetYesNoList() {
         yesNoList = new ArrayList<String>();
-    }
-
-    public void setYesNoList(List<String> yesNoList) {
-        this.yesNoList = yesNoList;
     }
 
     String question;

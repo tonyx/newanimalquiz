@@ -12,7 +12,8 @@ import org.tonyzt.kata.*;
 public class ThoughtAnimalStored implements State {
     @Override
     public void step(StateContext sc, AnimalQuiz animalQuiz,InStream instream, OutStream outStream) {
-        outStream.output("What question would you suggest to distinguish a "+animalQuiz.getCurrentNode().getAnimal()+" from a "+animalQuiz.getThoughtAnimal()+"?");
+        outStream.output(animalQuiz.getSpeaker().askWhatIsTheDiscriminatingQuestion(animalQuiz.getCurrentNode().getAnimal(),animalQuiz.getThoughtAnimal()));
+        //outStream.output(Conversator.getInstance().askWhatIsTheDiscriminatingQuestion(animalQuiz.getCurrentNode().getAnimal(),animalQuiz.getThoughtAnimal()));
         String question = instream.getInput();
         sc.setQuestion(question);
         sc.setState(new GettingAnswer());

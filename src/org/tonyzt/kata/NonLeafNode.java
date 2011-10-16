@@ -16,9 +16,12 @@ import java.util.List;
 public class NonLeafNode implements NodeI {
     private String question;
     private NodeI yesBranch;
-    public void conversate(StateContext sc, OutStream outStream) {
-        outStream.output(getQuestion());
-        sc.setState(new Guessing());
+
+    @Override
+    public void conversate(Speaker speaker, StateContext stateContext, OutStream outStream) {
+        outStream.output(speaker.ask(getQuestion()));
+        stateContext.setState(new Guessing());
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     private NodeI noBranch;
@@ -73,11 +76,11 @@ public class NonLeafNode implements NodeI {
         return result;
     }
 
-    public NodeI arrangeByPath(List<String> strings, String newAnimal, String question, String yesNoAnswer) {
+    public NodeI arrangeKnowledge(List<String> strings, String newAnimal, String question, String yesNoAnswer) {
         List<String> tail = (strings.size()>=1?strings.subList(1,strings.size()):new ArrayList<String>());
         String head = (strings.size()>0?strings.get(0):"");
-        return (head.equalsIgnoreCase("Yes")? new NonLeafNode(this.getQuestion(),this.getYesBranch().arrangeByPath(tail, newAnimal, question, yesNoAnswer),this.getNoBranch()):
-                new NonLeafNode(this.getQuestion(),this.getYesBranch(),this.getNoBranch().arrangeByPath(tail,newAnimal,question,yesNoAnswer)));
+        return (head.equalsIgnoreCase("Yes")? new NonLeafNode(this.getQuestion(),this.getYesBranch().arrangeKnowledge(tail, newAnimal, question, yesNoAnswer),this.getNoBranch()):
+                new NonLeafNode(this.getQuestion(),this.getYesBranch(),this.getNoBranch().arrangeKnowledge(tail, newAnimal, question, yesNoAnswer)));
     }
 
     private String getQuestion() {

@@ -12,10 +12,10 @@ import org.tonyzt.kata.*;
 public class GettingAnswer implements State {
     @Override
     public void step(StateContext sc, AnimalQuiz animalQuiz,InStream instream, OutStream outStream) {
-        String question = sc.getQuestion();
-        outStream.output("What should be the answer to the question \""+question+"\" "+"to indicate a "+animalQuiz.getThoughtAnimal()+" compared to a "+animalQuiz.getCurrentNode().getAnimal()+"?");
+        animalQuiz.getSpeaker().askAnswer(outStream, sc.getQuestion(), animalQuiz.getThoughtAnimal(), animalQuiz.getCurrentNode().getAnimal());
+        //Conversator.getInstance().askAnswer(outStream, sc.getQuestion(), animalQuiz.getThoughtAnimal(), animalQuiz.getCurrentNode().getAnimal());
         String answer = instream.getInput();
-        animalQuiz.addKnowledge(sc.getYesNoList(), question, answer, animalQuiz.getThoughtAnimal());
+        animalQuiz.addKnowledge(sc.getYesNoList(), sc.getQuestion(), answer, animalQuiz.getThoughtAnimal());
         sc.setState(new Started());
     }
 }

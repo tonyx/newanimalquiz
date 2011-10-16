@@ -3,7 +3,6 @@ package org.tonyzt.kata;
 import org.tonyzt.kata.states.GuessMade;
 import org.tonyzt.kata.states.StateContext;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,8 +15,8 @@ import java.util.List;
 public class LeafNode implements NodeI {
     private String animal;
 
-    public void conversate(StateContext sc, OutStream outStream) {
-        outStream.output("Is it a " + getAnimal() + "?");
+    public void conversate(Speaker speaker, StateContext sc, OutStream outStream) {
+        outStream.output(speaker.askIfIsThisOne(getAnimal()));
         sc.setState(new GuessMade());
     }
 
@@ -54,9 +53,9 @@ public class LeafNode implements NodeI {
         result = 31 * result + (animal != null ? animal.hashCode() : 0);
         return result;
     }
-
-    public NodeI arrangeByPath(List<String> strings, String newAnimal, String question, String yesNoAnswer) {
+    public NodeI arrangeKnowledge(List<String> strings, String newAnimal, String question, String yesNoAnswer) {
         NodeI node = (yesNoAnswer.equalsIgnoreCase("no")?new NonLeafNode(question,new LeafNode(this.animal),new LeafNode(newAnimal)):
+        //NodeI node = (yesNoAnswer.equalsIgnoreCase(Conversator.getInstance().no())?new NonLeafNode(question,new LeafNode(this.animal),new LeafNode(newAnimal)):
                 new NonLeafNode(question,new LeafNode(newAnimal), new LeafNode(this.animal)));
         return node;
     }

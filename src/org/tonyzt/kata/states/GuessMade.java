@@ -13,13 +13,15 @@ public class GuessMade implements State {
     @Override
     public void step(StateContext sc, AnimalQuiz animalQuiz, InStream instream, OutStream outStream) {
         String confirmation = instream.getInput();
-        if ("no".equalsIgnoreCase(confirmation)) {
-            outStream.output("What animal was?");
+        if (animalQuiz.getSpeaker().no().equalsIgnoreCase(confirmation)) {
+            outStream.output(animalQuiz.getSpeaker().askWhatAnimalWas());
             animalQuiz.setThoughtAnimal(instream.getInput());
             sc.setState(new ThoughtAnimalStored());
-        } else if ("yes".equalsIgnoreCase(confirmation)) {
+        } else if (animalQuiz.getSpeaker().yes().equalsIgnoreCase(confirmation)) {
             outStream.output("yeah");
             sc.setState(new Started());
-        } else outStream.output("yes or not");
+        } else {
+            animalQuiz.getSpeaker().remindYesOrNot();
+        }
     }
 }

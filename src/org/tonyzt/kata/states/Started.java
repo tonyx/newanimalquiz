@@ -13,19 +13,8 @@ import org.tonyzt.kata.*;
 public class Started implements State {
     @Override
     public void step(StateContext sc, AnimalQuiz animalQuiz,InStream instream, OutStream outStream) {
-
         sc.resetYesNoList();
-        animalQuiz.setCurrentNode(animalQuiz.getKnowledgeTree());
-
-        animalQuiz.getKnowledgeTree().conversate(sc, outStream);
-//        if (animalQuiz.getKnowledgeTree().isLeaf()) {
-//            String animal = animalQuiz.getKnowledgeTree().getAnimal();
-//            outStream.output("Is it a "+animal+"?");
-//            sc.setState(new GuessMade());
-//        } else {
-//            sc.setState(new Guessing());
-//            outStream.output(animalQuiz.getKnowledgeTree().getQuestion());
-//        }
-
+        animalQuiz.reAlignCurrentNodeToRoot();
+        animalQuiz.conversate(sc,outStream);
     }
 }
